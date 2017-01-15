@@ -12,27 +12,7 @@ public class MainTest {
 
     @Test
     public void testSillyCase0() throws Exception {
-        assertEquals(run("quartz 3"), "4");
-    }
-
-    @Test
-    public void testSillyCase1() throws Exception {
-        assertEquals(run("straight 3"), "11");
-    }
-
-    @Test
-    public void testSillyCase2() throws Exception {
-        assertEquals(run("gcj 2"), "3");
-    }
-
-    @Test
-    public void testSillyCase3() throws Exception {
-        assertEquals(run("tsetse 2"), "11");
-    }
-
-    @Test
-    public void testSillyCase4() throws Exception {
-        assertEquals(run("abbbabbba 3"), "20");
+        assertEquals(run("?6? ?0?"), "069 100");
     }
 
     private static String run(String... lines) {
@@ -54,4 +34,5 @@ public class MainTest {
 
         return stringWriter.toString();
     }
+
 }
