@@ -1,20 +1,8 @@
-import com.google.common.base.Stopwatch;
-import com.google.common.base.Throwables;
-
-import javax.annotation.Nonnull;
-
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
-import java.util.concurrent.*;
-import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class Main implements BiFunction<Scanner, PrintWriter, Optional<String>> {
 

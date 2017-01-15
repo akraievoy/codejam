@@ -31,21 +31,20 @@ public class MainTest {
     }
 
     private static String run(String... lines) {
-        final String lineSep = System.getProperty("line.separator");
-        final StringBuilder buf = new StringBuilder();
+        final StringWriter inWriter = new StringWriter();
+        final PrintWriter inPrintWriter = new PrintWriter(inWriter);
         for (String line : lines) {
-            buf.append(line);
-            buf.append(lineSep);
+            inPrintWriter.println(line);
         }
+        inPrintWriter.close();
 
         final StringWriter stringWriter = new StringWriter();
         final PrintWriter printWriter = new PrintWriter(stringWriter);
         final Optional<String> maybeSingleLine = new Main().apply(
-            new Scanner(new StringReader(buf.toString())),
+            new Scanner(new StringReader(inWriter.toString())),
             printWriter
         );
         maybeSingleLine.ifPresent(printWriter::print);
-        printWriter.flush();
         printWriter.close();
 
         return stringWriter.toString();
