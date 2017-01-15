@@ -4,11 +4,14 @@
 .idea/dictionaries/*
 .idea/shelf
 
+
 bin/
-inout/*/*.actual.out
+build/
+out/
+**/*.actual.out
 *.zip
 
 gradlew
 gradlew.bat
 gradle/*
-codejam-java.iws
+.gradle

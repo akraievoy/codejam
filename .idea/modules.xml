@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/codejam.iml" filepath="$PROJECT_DIR$/codejam.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/codejam.iml" filepath="$PROJECT_DIR$/.idea/modules/codejam.iml" />
     </modules>
   </component>
 </project>

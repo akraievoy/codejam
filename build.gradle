@@ -1,0 +1,60 @@
+ext.TASK_RELPATH=project.properties['TASK_RELPATH'] ?: 'src/cj13_1b_a_osmos'
+ext.TASK_BINARY=project.properties['TASK_BINARY'] ?: 'cj13_1b_a_osmos'
+
+apply plugin: 'java'
+
+sourceCompatibility = 1.8
+version = '1.1'
+archivesBaseName=TASK_BINARY
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile fileTree(dir: 'lib', include: '*.jar')
+    compile group: 'it.unimi.dsi', name: 'fastutil', version: '7.0.12'
+    compile group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.0'
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.12'
+    compile group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.12'
+    compile group: 'com.google.guava', name: 'guava', version: '18.0'
+    compile group: 'joda-time', name: 'joda-time', version: '2.7'
+    compile group: 'org.apache.commons', name: "commons-lang3", version: "3.0"
+    testCompile group: 'org.testng', name: 'testng', version: '6.8.21'
+}
+
+sourceSets {
+    main{
+        java {
+            srcDirs = [TASK_RELPATH]
+            include '**'
+            exclude '**/*Test.java'
+        }
+        resources {
+            srcDirs = [TASK_RELPATH]
+            include '**'
+        }
+    }
+    test {
+        java {
+            srcDirs = [TASK_RELPATH]
+            include '**/*Test.java'
+        }
+    }
+}
+
+test{
+    useTestNG()
+}
+
+apply plugin: 'application'
+mainClassName = 'Main'
+
+jar {
+  manifest {
+    attributes "Main-Class": "$mainClassName"
+  }
+  from {
+    configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+  }
+}
