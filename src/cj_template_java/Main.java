@@ -5,36 +5,15 @@ import java.util.Scanner;
 import java.util.function.BiFunction;
 
 public class Main implements BiFunction<Scanner, PrintWriter, Optional<String>> {
-  private final static char[] vowels = "aeiou".toCharArray();
-
   @Override
   public Optional<String> apply(Scanner in, PrintWriter out) {
-    final String name = in.next();
-    final int L = in.nextInt();
-    final int n = name.length();
-
-    long total = 0;
-    int prevStart = -1;
-    int sequenceCount = 0;
-    for (int pos = 0; pos < L; pos++) {
-      if (!isVowel(name.charAt(pos))) {
-        sequenceCount++;
-      }
-      if (pos >= n && !isVowel(name.charAt(pos - n))) {
-        sequenceCount--;
-      }
-      if (sequenceCount == n) {
-        final int start = pos - n + 1;
-        total += ((long) (L-pos)) * (start - prevStart);
-        prevStart = start;
-      }
+    final int n = in.nextInt();
+    long sum = 0;
+    for (int i=0; i < n; i++) {
+        sum += in.nextLong();
     }
 
-    return Optional.of(String.valueOf(total));
-  }
-
-  private static boolean isVowel(char ch) {
-    return Arrays.binarySearch(vowels, ch) >= 0;
+    return Optional.of(String.valueOf(sum));
   }
 
   public static void main(String[] args) {
