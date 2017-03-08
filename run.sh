@@ -55,7 +55,19 @@ if [[ "${JAM_WITH}" == "go" ]] ; then
   bash -c "GOROOT=${GOROOT} && GOPATH=${GOPATH} && time ${GOROOT}/bin/go build -o bin/${TASK_BINARY} ${TASK_RELPATH}/Solution.go"
 elif [[ "${JAM_WITH}" == "java" ]] ; then
   pretty_echo "${TASK_RELPATH}" "gradle clean test jar"
-  gradle "-PTASK_RELPATH=${TASK_RELPATH}" "-PTASK_BINARY=${TASK_BINARY}" clean test jar
+  if test -f "${TASK_RELPATH}/Solution.java" ; then
+    gradle \
+      "-PTASK_RELPATH=${TASK_RELPATH}" \
+      "-PTASK_BINARY=${TASK_BINARY}" \
+      "-PTASK_MAIN=Solution" \
+      clean test jar
+  else
+    gradle \
+      "-PTASK_RELPATH=${TASK_RELPATH}" \
+      "-PTASK_BINARY=${TASK_BINARY}" \
+      "-PTASK_MAIN=Main" \
+      clean test jar
+  fi
 else
   echo "I am not yet educated to build binaries while jamming with ${JAM_WITH}, sorry"
   exit 1
@@ -79,7 +91,7 @@ for TEST_IN in `find ${TASK_RELPATH} -iname '*.in' | sort -n`; do
       exit 1
     fi
 
-    diff -y --suppress-common-lines \
+    diff -y --suppress-common-lines  --ignore-all-space \
         ${TEST_BASE}.out \
         ${TEST_BASE}.${CJ_TIME}.actual.out
 done

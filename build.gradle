@@ -1,5 +1,6 @@
 ext.TASK_RELPATH=project.properties['TASK_RELPATH'] ?: 'src/cj13_1b_a_osmos'
 ext.TASK_BINARY=project.properties['TASK_BINARY'] ?: 'cj13_1b_a_osmos'
+ext.TASK_MAIN=project.properties['TASK_MAIN'] ?: 'Main'
 
 apply plugin: 'java'
 
@@ -48,7 +49,7 @@ test{
 }
 
 apply plugin: 'application'
-mainClassName = 'Main'
+mainClassName = TASK_MAIN
 
 jar {
   manifest {
