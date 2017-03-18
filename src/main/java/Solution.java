@@ -1,5 +1,4 @@
 import java.io.BufferedWriter;
-import java.io.ByteArrayInputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.*;
@@ -13,6 +12,7 @@ public class Solution {
       127, 131, 137, 139, 149, 151, 157, 163, 167, 173,
       179, 181, 191, 193, 197, 199
     };
+  public static final boolean DEBUG = false;
 
   public final static class ModRem implements Comparable<ModRem> {
     public final int modulo;
@@ -43,79 +43,27 @@ public class Solution {
   }
 
   public static void main(String[] args) {
-    Random random = null;
-    boolean selfTest = false;
-    if (args.length > 0) {
-      if (args[0].equals("test1")) {
-        System.setIn(new ByteArrayInputStream((
-          "5 3\n" +
-          "250 501 5000 5 4\n" +
-          "0 4 5 0\n" +  // --> 3
-          "0 4 10 0\n" + // --> 2
-          "0 4 3 2"      // --> 2
-        ).getBytes()));
-      } else if (args[0].equals("test2")) {
-        System.setIn(new ByteArrayInputStream((
-          "100 6\n" +
-          "0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99\n" +
-          "0 99 33 0\n" + //  --> 4
-          "0 99 33 1\n" + //  --> 3
-          "0 99 33 2\n" + //  --> 3
-          "0 99 7 5\n" +  //  --> 14
-          "0 99 98 1\n" + //  --> 2
-          "0 99 19 2"     //  --> 6
-        ).getBytes()));
-      } else if (args[0].equals("test3")) {
-        System.setIn(new ByteArrayInputStream((
-          "100 12\n" +
-          "0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99\n" +
-          "0 0 100 0\n" + //  --> 1
-          "0 1 100 0\n" + //  --> 1
-          "1 1 100 0\n" + //  --> 0
-          "49 51 100 50\n" + //  --> 1
-          "49 50 100 50\n" + //  --> 1
-          "50 50 100 50\n" + //  --> 1
-          "50 51 100 50\n" + //  --> 1
-          "51 51 100 50\n" + //  --> 0
-          "49 49 100 50\n" + //  --> 0
-          "98 98 100 99\n" +  //  --> 0
-          "98 99 100 99\n" + //  --> 1
-          "99 99 100 99"     //  --> 1
-        ).getBytes()));
-      } else if (args[0].equals("test4")) {
-        selfTest = true;
-        final long seed;
-        if (args.length > 1) {
-          seed = Long.parseLong(args[1]);
-        } else {
-          seed = System.currentTimeMillis();
-        }
-        System.out.println("seed = " + seed);
-        random = new Random(seed);
-      }
-    }
-
     //  the idea is to cache matching indexes
     //    for modRemKeys of all prime power / modulo pairs
     //    that we actually use in queries
-    final Map<ModRem, int[]> modRemToIndexes = new HashMap<>(1000, 0.5f);
+    final Map<ModRem, int[]> modRemToIndexes = new HashMap<>(40000, 0.5f);
 
     final Scanner in = new Scanner(System.in);
-    final int n = selfTest ? 40000 : in.nextInt();
-    final int queries = selfTest ? 40000 : in.nextInt();
+    final int n = in.nextInt();
+    final int queries = in.nextInt();
 
     final int[] a = new int[n];
     for (int i = 0; i < n; i++) {
-      a[i] = selfTest ? i : in.nextInt();
+      a[i] = in.nextInt();
     }
     final int[] lefts = new int[queries];
     final int[] rights = new int[queries];
     final List<List<ModRem>> queryModRems = new ArrayList<>();
     for (int q = 0; q < queries; q++) {
-      lefts[q] = selfTest ? random.nextInt(20000) : in.nextInt();
-      rights[q] = selfTest ? 20000 + random.nextInt(20000) : in.nextInt();
-      int queryModulo = selfTest ? 1 + random.nextInt(40000) : in.nextInt();
-      final int queryRemainder = selfTest ? random.nextInt(queryModulo) : in.nextInt();
+      lefts[q] = in.nextInt();
+      rights[q] = in.nextInt();
+      int queryModulo = in.nextInt();
+      final int queryRemainder = in.nextInt();
 
       final List<ModRem> queryModRemsLocal = new ArrayList<>();
       int primeTriedIdx = 0;
@@ -144,48 +92,53 @@ public class Solution {
     //      even for the most carefully crafted adverse/evil test case
     //        each query has to use products of globally disjoint sets of mod/rems with mods we keep globally co-prime
     //          worst case is 7 mods (2,3,5,7,11,13 = 30030), average would be like 3 for 40k queries
-    final Set<ModRem> uniqueModRemsSet = new HashSet<>(1000, 0.5f);
+    final long dedupeStarted = System.currentTimeMillis();
+    final Set<ModRem> uniqueModRemsSet = new HashSet<>(40000, 0.5f);
     for (int q = 0; q < queries; q++) {
       uniqueModRemsSet.addAll(queryModRems.get(q));
     }
 
     final ModRem[] uniqueModRems = uniqueModRemsSet.toArray(new ModRem[uniqueModRemsSet.size()]);
     Arrays.sort(uniqueModRems);
+    final long dedupeEnded = System.currentTimeMillis();
 
-    if (selfTest) {
-      System.out.println("uniqueModRems.length = " + uniqueModRems.length);
+    if (DEBUG) {
+      System.err.println("uniqueModRems.length = " + uniqueModRems.length + " in " + (dedupeEnded-dedupeStarted) + " msec");
     }
 
     int divisionScans = 0;
     if (uniqueModRems.length > 0) {
-      final BitSet interestingRems = new BitSet();
+      final int[] interestingRems = new int[40000];
       int mod = uniqueModRems[0].modulo;
-      interestingRems.set(uniqueModRems[0].remainder);
+      int interestingRemsSize = 1;
+      interestingRems[0] = uniqueModRems[0].remainder;
       for (int mrI = 1; mrI < uniqueModRems.length; mrI++) {
         final ModRem modRem = uniqueModRems[mrI];
         if (modRem.modulo == mod) {
-          interestingRems.set(modRem.remainder);
+          interestingRems[interestingRemsSize] = modRem.remainder;
+          interestingRemsSize += 1;
         } else {
           //   this won't be called more than 5k times (divisors we factor queries into are powers of primes under 40k)
-          populateIndexes(a, mod, interestingRems, modRemToIndexes);
+          populateIndexes(a, mod, interestingRems, interestingRemsSize, modRemToIndexes);
           divisionScans += 1;
           mod = modRem.modulo;
-          interestingRems.clear();
-          interestingRems.set(modRem.remainder);
+          interestingRemsSize = 1;
+          interestingRems[0] = modRem.remainder;
         }
       }
-      populateIndexes(a, mod, interestingRems, modRemToIndexes);
+      populateIndexes(a, mod, interestingRems, interestingRemsSize, modRemToIndexes);
       divisionScans += 1;
     }
 
-    if (selfTest) {
-      System.out.println("divisionScans = " + divisionScans);
+    if (DEBUG) {
+      System.err.println("divisionScans = " + divisionScans);
     }
 
     final PrintWriter out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(System.out), 4 * 1024 * 1024));
 
-    List<Integer> intersection = new ArrayList<>(40000);
-    List<Integer> intersectionTemp = new ArrayList<>(40000);
+    int intersectionSize;
+    int[] intersection = new int[40000];
+    int[] intersectionTemp = new int[40000];
     for (int q = 0; q < queries; q++) {
       final int left = lefts[q];
       final int right = rights[q];
@@ -208,7 +161,7 @@ public class Solution {
         out.println(rightPos - leftPos);
       } else {
 
-        intersection.clear();
+        intersectionSize = 0;
         final int leftSearch = Arrays.binarySearch(sparsest, left);
         final int leftPos = leftSearch >= 0 ? leftSearch : -leftSearch - 1;
         for (int i = leftPos; i < sparsest.length; i++) {
@@ -216,12 +169,13 @@ public class Solution {
           if (idx > right) {
             break;
           }
-          intersection.add(idx);
+          intersection[intersectionSize] = idx;
+          intersectionSize += 1;
         }
 
-        for (int modRemI = modRems.size() - 2; !intersection.isEmpty() && modRemI >= 0; modRemI--) {
-          final int lefter = intersection.get(0);
-          final int righter = intersection.get(intersection.size() - 1);
+        for (int modRemI = modRems.size() - 2; intersectionSize > 0 && modRemI >= 0; modRemI--) {
+          final int lefter = intersection[0];
+          final int righter = intersection[intersectionSize - 1];
           final int[] modRemIdx = modRemToIndexes.get(modRems.get(modRemI));
 
           final int lefterSearch = Arrays.binarySearch(modRemIdx, lefter);
@@ -230,13 +184,14 @@ public class Solution {
           final int righterPos = righterSearch >= 0 ? righterSearch : -righterSearch - 1;
 
           int intersectionPos = 0;
-          intersectionTemp.clear();
-          for (int idxPos = lefterPos; intersectionPos < intersection.size() && idxPos < righterPos; ) {
-            final int compare = Integer.compare(intersection.get(intersectionPos), modRemIdx[idxPos]);
+          int intersectionTempSize = 0;
+          for (int idxPos = lefterPos; intersectionPos < intersectionSize && idxPos < righterPos; ) {
+            final int compare = Integer.compare(intersection[intersectionPos], modRemIdx[idxPos]);
             if (compare < 0) {
               intersectionPos++;
             } else if (compare == 0) {
-              intersectionTemp.add(intersection.get(intersectionPos));
+              intersectionTemp[intersectionTempSize] = intersection[intersectionPos];
+              intersectionTempSize += 1;
               idxPos++;
               intersectionPos++;
             } else {
@@ -244,12 +199,13 @@ public class Solution {
             }
           }
 
-          final List<Integer> swapTemp = intersection;
+          final int[] swapTemp = intersection;
           intersection = intersectionTemp;
           intersectionTemp = swapTemp;
+          intersectionSize = intersectionTempSize;
         }
 
-        out.println(intersection.size());
+        out.println(intersectionSize);
       }
     }
 
@@ -257,13 +213,11 @@ public class Solution {
     out.close();
   }
 
-  private static void populateIndexes(int[] a, int mod, BitSet interestingRems, Map<ModRem, int[]> modRemToIndexes) {
+  private static void populateIndexes(int[] a, int mod, int[] interestingRems, int interestingRemsSize, Map<ModRem, int[]> modRemToIndexes) {
     int[] indexesSizes = new int[mod];
     int[][] indexes = new int[mod][];
-    for (int rem = 0; rem < mod; rem++) {
-      if (interestingRems.get(rem)) {
-        indexes[rem] = new int[a.length];
-      }
+    for (int interestingRemIdx = 0; interestingRemIdx < interestingRemsSize; interestingRemIdx++) {
+      indexes[interestingRems[interestingRemIdx]] = new int[a.length];
     }
     for (int i = 0; i < a.length; i++) {
       final int aRem = a[i] % mod;
