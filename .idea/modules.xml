@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/codejam.iml" filepath="$PROJECT_DIR$/.idea/modules/codejam.iml" />
+      <module fileurl="file://$PROJECT_DIR$/go/go.iml" filepath="$PROJECT_DIR$/go/go.iml" />
     </modules>
   </component>
 </project>
