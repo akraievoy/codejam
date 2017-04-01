@@ -29,7 +29,7 @@ public class TaskGen {
     out.println();
 
     for (int q = 0; q < queries; q++) {
-      final int modulo = 1 + random.nextInt(4000);
+      final int modulo = 1 + random.nextInt(40000);
       out.println(
         random.nextInt(n/2+1) + " " +
           (n/2 + random.nextInt((n + 1)/2)) + " "
