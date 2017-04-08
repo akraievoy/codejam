@@ -1,9 +1,6 @@
 .idea/workspace.xml
 .idea/dbnavigator.xml
 .idea/uiDesigner.xml
-gradlew
-gradlew.bat
-.gradle
-build
-gradle
-go/Solution
+
+bin/codejam_go
+inout/*.*_*.out
