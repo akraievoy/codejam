@@ -2,5 +2,5 @@
 .idea/dbnavigator.xml
 .idea/uiDesigner.xml
 
-bin/codejam_go
+bin/codejam_*
 inout/*.*_*.out
