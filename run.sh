@@ -7,7 +7,7 @@ export CJ_HOME=${1-$HOME/Downloads/codejam}
 
 export CJ_TIME=`date +%y%m%d_%H%M%S`
 
-export CJ_TASK=`git rev-parse --abbrev-ref HEAD`
+export CJ_TASK=`git rev-parse --abbrev-ref HEAD | sed -Ee 's:/(go|java)$::g' | sed -Ee 's:[^/]+/::g'`
 
 echo
 echo
@@ -17,7 +17,7 @@ go test
 echo
 echo
 echo '----------============= GO BUILD =============----------'
-go build -o bin/${CJ_TASK} codejam.go
+go build -o bin/${CJ_TASK} solution.go
 
 echo
 echo
@@ -29,20 +29,12 @@ for TEST_IN in `ls -1 inout/ | grep '.in$'`; do
   diff inout/${TEST_BASE}.${CJ_TIME}.out inout/${TEST_BASE}.out
 done
 
-mkdir -p $CJ_HOME/$CJ_TASK/$CJ_TIME
-
 echo
 echo
-echo '----------============= ZIPPING SOLUTION =============----------'
-zip -r \
-  $CJ_HOME/$CJ_TASK/$CJ_TIME/$CJ_TASK-$CJ_TIME.zip \
-  *.go
-
-unzip -l $CJ_HOME/$CJ_TASK/$CJ_TIME/$CJ_TASK-$CJ_TIME.zip
-
 echo
 echo
-echo '----------============= LISTENING FOR DOWNLOADS =============----------'
-echo watching for new downloads at $CJ_HOME/$CJ_TASK/$CJ_TIME && \
-  fileschanged --show=created --recursive --timeout=2 $CJ_HOME/$CJ_TASK/$CJ_TIME | \
-  xargs -L1 -iIN bash -c "if [[ IN = *.in ]] ; then echo IN && bin/${CJ_TASK} IN > IN.out ; fi"
+echo
+echo
+echo '----------===========<[ READY FOR UPLOAD ]>===========----------'
+echo '----------==========<[[ READY FOR UPLOAD ]]>==========----------'
+echo '----------===========<[ READY FOR UPLOAD ]>===========----------'

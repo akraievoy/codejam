@@ -4,20 +4,17 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"runtime"
 	"strconv"
 )
 
 type In struct {
-	index int32
 	// FIXME test case input structure
-	nums []int16
+	nums  []int16
 }
 
 type Out struct {
-	index int32
 	// FIXME test case output structure
-	sum int32
+	sum   int32
 }
 
 func solve(in In) (out Out) {
@@ -26,13 +23,7 @@ func solve(in In) (out Out) {
 	for _, v := range in.nums {
 		sum += int32(v)
 	}
-	return Out{in.index, sum}
-}
-
-func solveChannel(ins <-chan In, outs chan<- Out) {
-	for in := range ins {
-		outs <- solve(in)
-	}
+	return Out{sum}
 }
 
 func main() {
@@ -52,38 +43,18 @@ func main() {
 	var writer *bufio.Writer = bufio.NewWriter(os.Stdout)
 	defer writer.Flush()
 
-	caseCount := ReadInt32(scanner)
-
-	cores := runtime.NumCPU()
-	var ins = make(chan In, cores)
-	var outs = make(chan Out, caseCount)
-	for t := 0; t < cores; t++ {
-		go solveChannel(ins, outs)
+	//	FIXME read the in
+	size := ReadInt16(scanner)
+	nums := make([]int16, size)
+	for i := range nums {
+		nums[i] = ReadInt16(scanner)
 	}
+	in := In{nums}
 
-	for index := int32(0); index < caseCount; index++ {
-		//	FIXME read the in
-		size := ReadInt16(scanner)
-		nums := make([]int16, size)
-		for i := range nums {
-			nums[i] = ReadInt16(scanner)
-		}
-		in := In{index, nums}
-		ins <- in
-	}
-	close(ins)
+	out := solve(in)
 
-	outsSlice := make([]Out, caseCount)
-	for index := int32(0); index < caseCount; index++ {
-		out := <-outs
-		outsSlice[out.index] = out
-	}
-	close(outs)
-
-	for _, out := range outsSlice {
-		//	FIXME write the out
-		Writef(writer, "Case #%d: %d\n", 1 + out.index, out.sum)
-	}
+	//	FIXME write the out
+	Writef(writer, "%d\n", out.sum)
 }
 
 //	boring IO
