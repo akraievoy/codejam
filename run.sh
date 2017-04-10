@@ -7,7 +7,7 @@ export CJ_HOME=${1-$HOME/Downloads/codejam}
 
 export CJ_TIME=`date +%y%m%d_%H%M%S`
 
-export CJ_TASK=`git rev-parse --abbrev-ref HEAD`
+export CJ_TASK=`git rev-parse --abbrev-ref HEAD | sed -Ee 's:/(go|java)$::g' | sed -Ee 's:[^/]+/::g'`
 
 echo
 echo
