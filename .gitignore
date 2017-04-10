@@ -3,5 +3,6 @@
 .idea/uiDesigner.xml
 .idea/shelf
 
+bin/template*
 bin/codejam_*
 inout/*.*_*.out
