@@ -25,7 +25,7 @@ echo '----------============= SAMPLE IN/OUT FILES =============----------'
 for TEST_IN in `ls -1 inout/ | grep '.in$'`; do
   TEST_BASE=`echo $TEST_IN | sed -e 's/\.in$//g'`
   echo "running $TEST_IN -> $TEST_BASE.${CJ_TIME}.out..."
-  bin/${CJ_TASK} inout/$TEST_IN > inout/${TEST_BASE}.${CJ_TIME}.out
+  time bin/${CJ_TASK} inout/$TEST_IN > inout/${TEST_BASE}.${CJ_TIME}.out
   diff inout/${TEST_BASE}.${CJ_TIME}.out inout/${TEST_BASE}.out
 done
 
