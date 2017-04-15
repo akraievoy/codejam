@@ -2,9 +2,15 @@ package main
 
 import (
 	"testing"
+	"time"
+	"math/rand"
 )
 
 func TestSimple(t *testing.T) {
+	var rnd = rand.NewSource(time.Now().UnixNano())
+	if false {
+		rnd.Int63()
+	}
 	// FIXME simple test case
 	out := solve(In{3, []int16{2, 3, 5}})
 

@@ -17,12 +17,12 @@ go test
 echo
 echo
 echo '----------============= GO BUILD =============----------'
-go build -o bin/${CJ_TASK} codejam.go
+go build -o bin/${CJ_TASK} cruft.go solution.go
 
 echo
 echo
 echo '----------============= SAMPLE IN/OUT FILES =============----------'
-for TEST_IN in `ls -1 inout/ | grep '.in$'`; do
+for TEST_IN in `ls -1 inout/ | grep '.in$' | sort`; do
   TEST_BASE=`echo $TEST_IN | sed -e 's/\.in$//g'`
   echo "running $TEST_IN -> $TEST_BASE.${CJ_TIME}.out..."
   bin/${CJ_TASK} inout/$TEST_IN > inout/${TEST_BASE}.${CJ_TIME}.out
