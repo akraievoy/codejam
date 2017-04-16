@@ -12,17 +12,20 @@ export CJ_TASK=`git rev-parse --abbrev-ref HEAD | sed -Ee 's:/(go|java)$::g' | s
 echo
 echo
 echo '----------============= GO TEST =============----------'
-go test
+bash -c "GOPATH=`pwd`:$GOPATH && cd src && pwd && env | grep GOPATH && go test"
 
 echo
 echo
 echo '----------============= GO BUILD =============----------'
-go build -o bin/${CJ_TASK} solution.go
+bash -c "GOPATH=`pwd`:$GOPATH && cd src && pwd && go build -o ../bin/${CJ_TASK}"
 
 echo
 echo
 echo '----------============= SAMPLE IN/OUT FILES =============----------'
-for TEST_IN in `ls -1 inout/ | grep '.in$'`; do
+for TEST_OUT in `ls -1 inout/ | grep -E '[0-9]+_[0-9]+.out$'` ; do
+  echo "deleting $TEST_OUT" && rm inout/$TEST_OUT
+done;
+for TEST_IN in `ls -1 inout/ | grep '.in$' | sort`; do
   TEST_BASE=`echo $TEST_IN | sed -e 's/\.in$//g'`
   echo "running $TEST_IN -> $TEST_BASE.${CJ_TIME}.out..."
   time bin/${CJ_TASK} inout/$TEST_IN > inout/${TEST_BASE}.${CJ_TIME}.out
