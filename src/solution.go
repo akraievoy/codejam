@@ -44,10 +44,10 @@ func main() {
 	defer writer.Flush()
 
 	//	FIXME read the in
-	size := ReadInt16(scanner)
+	size := int16(ReadInt(scanner))
 	nums := make([]int16, size)
 	for i := range nums {
-		nums[i] = ReadInt16(scanner)
+		nums[i] = int16(ReadInt(scanner))
 	}
 	in := In{nums}
 
@@ -57,41 +57,17 @@ func main() {
 	Writef(writer, "%d\n", out.sum)
 }
 
-//	boring IO
 func ReadInt64(sc *bufio.Scanner) int64 {
 	sc.Scan()
 	res, err := strconv.ParseInt(sc.Text(), 10, 64)
 	if err != nil {
 		panic(err)
 	}
-	return int64(res)
+	return res
 }
 
-func ReadInt32(sc *bufio.Scanner) int32 {
-	sc.Scan()
-	res, err := strconv.ParseInt(sc.Text(), 10, 32)
-	if err != nil {
-		panic(err)
-	}
-	return int32(res)
-}
-
-func ReadInt16(sc *bufio.Scanner) int16 {
-	sc.Scan()
-	res, err := strconv.ParseInt(sc.Text(), 10, 16)
-	if err != nil {
-		panic(err)
-	}
-	return int16(res)
-}
-
-func ReadInt8(sc *bufio.Scanner) int8 {
-	sc.Scan()
-	res, err := strconv.ParseInt(sc.Text(), 10, 8)
-	if err != nil {
-		panic(err)
-	}
-	return int8(res)
+func ReadInt(sc *bufio.Scanner) int {
+	return int(ReadInt64(sc))
 }
 
 func Writef(writer *bufio.Writer, formatStr string, values ...interface{}) {
@@ -100,4 +76,32 @@ func Writef(writer *bufio.Writer, formatStr string, values ...interface{}) {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func min(a, b int) int {
+	if (a < b) {
+		return a
+	}
+	return b
+}
+
+func max(a, b int) int {
+	if (a > b) {
+		return a
+	}
+	return b
+}
+
+func min64(a, b int64) int64 {
+	if (a < b) {
+		return a
+	}
+	return b
+}
+
+func max64(a, b int64) int64 {
+	if (a > b) {
+		return a
+	}
+	return b
 }
