@@ -56,6 +56,10 @@ func (ufp *UnionFind) Find(p uint32) uint32 {
 	return root;
 }
 
+func (ufp *UnionFind) Size(p uint32) uint32 {
+	return ufp.size[ufp.Find(p)]
+}
+
 func (ufp *UnionFind) Connected(p, q uint32) bool {
 	return ufp.Find(p) == ufp.Find(q);
 }
