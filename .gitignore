@@ -1,7 +1,9 @@
 .idea/workspace.xml
 .idea/dbnavigator.xml
 .idea/uiDesigner.xml
+.idea/dictionaries/*
 .idea/shelf
 
-bin/codejam_*
+bin/template*
+bin/*_*
 inout/*.*_*.out

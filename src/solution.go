@@ -27,7 +27,7 @@ func solve(in In) Out {
 }
 
 func solveInput(scanner *bufio.Scanner, writer *bufio.Writer) {
-	caseCount := int(ReadInt32(scanner))
+	caseCount := ReadInt(scanner)
 
 	cores := runtime.NumCPU()
 	var ins = make(chan In, cores)
@@ -39,10 +39,10 @@ func solveInput(scanner *bufio.Scanner, writer *bufio.Writer) {
 	outsSlice := make([]Out, caseCount)
 	for index := 0; index < caseCount; index++ {
 		//	FIXME read the in
-		size := ReadInt16(scanner)
+		size := int16(ReadInt(scanner))
 		nums := make([]int16, size)
 		for i := range nums {
-			nums[i] = ReadInt16(scanner)
+			nums[i] = int16(ReadInt(scanner))
 		}
 		in := In{index, nums}
 		ins <- in

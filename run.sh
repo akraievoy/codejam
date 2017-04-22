@@ -12,20 +12,23 @@ export CJ_TASK=`git rev-parse --abbrev-ref HEAD | sed -Ee 's:/(go|java)$::g' | s
 echo
 echo
 echo '----------============= GO TEST =============----------'
-go test
+bash -c "GOPATH=`pwd`:$GOPATH && cd src && pwd && env | grep GOPATH && go test"
 
 echo
 echo
 echo '----------============= GO BUILD =============----------'
-go build -o bin/${CJ_TASK} cruft.go solution.go
+bash -c "GOPATH=`pwd`:$GOPATH && cd src && pwd && go build -o ../bin/${CJ_TASK}"
 
 echo
 echo
 echo '----------============= SAMPLE IN/OUT FILES =============----------'
+for TEST_OUT in `ls -1 inout/ | grep -E '[0-9]+_[0-9]+.out$'` ; do
+  echo "deleting $TEST_OUT" && rm inout/$TEST_OUT
+done;
 for TEST_IN in `ls -1 inout/ | grep '.in$' | sort`; do
   TEST_BASE=`echo $TEST_IN | sed -e 's/\.in$//g'`
   echo "running $TEST_IN -> $TEST_BASE.${CJ_TIME}.out..."
-  bin/${CJ_TASK} inout/$TEST_IN > inout/${TEST_BASE}.${CJ_TIME}.out
+  time bin/${CJ_TASK} inout/$TEST_IN > inout/${TEST_BASE}.${CJ_TIME}.out
   diff inout/${TEST_BASE}.${CJ_TIME}.out inout/${TEST_BASE}.out
 done
 
@@ -36,12 +39,14 @@ echo
 echo '----------============= ZIPPING SOLUTION =============----------'
 zip -r \
   $CJ_HOME/$CJ_TASK/$CJ_TIME/$CJ_TASK-$CJ_TIME.zip \
-  *.go
+  src
 
 unzip -l $CJ_HOME/$CJ_TASK/$CJ_TIME/$CJ_TASK-$CJ_TIME.zip
 
 echo
 echo
+echo '----------============= LISTENING FOR DOWNLOADS =============----------'
+echo '----------============= LISTENING FOR DOWNLOADS =============----------'
 echo '----------============= LISTENING FOR DOWNLOADS =============----------'
 echo watching for new downloads at $CJ_HOME/$CJ_TASK/$CJ_TIME && \
   fileschanged --show=created --recursive --timeout=2 $CJ_HOME/$CJ_TASK/$CJ_TIME | \
