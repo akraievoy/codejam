@@ -1,0 +1,15 @@
+#!/bin/bash
+
+mkdir -p inout/$1 && mv -v inout/*.in inout/*.out inout/$1
+
+mkdir -p src/$1 && mv -v src/*.go src/$1
+
+mv -v src/$1/solution.go src/$1/Solution.go
+
+bash -c "cd src/$1 && mc"
+
+git checkout master
+
+git add src/$1 inout/$1
+
+./run.sh src/$1
