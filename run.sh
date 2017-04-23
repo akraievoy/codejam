@@ -29,7 +29,7 @@ for TEST_IN in `ls -1 inout/ | grep '.in$' | sort`; do
   TEST_BASE=`echo $TEST_IN | sed -e 's/\.in$//g'`
   echo "running $TEST_IN -> $TEST_BASE.${CJ_TIME}.out..."
   time bin/${CJ_TASK} inout/$TEST_IN > inout/${TEST_BASE}.${CJ_TIME}.out
-  diff -y inout/${TEST_BASE}.out inout/${TEST_BASE}.${CJ_TIME}.out
+  diff -y --suppress-common-lines inout/${TEST_BASE}.out inout/${TEST_BASE}.${CJ_TIME}.out
 done
 
 mkdir -p $CJ_HOME/$CJ_TASK/$CJ_TIME
