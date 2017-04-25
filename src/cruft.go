@@ -22,6 +22,13 @@ func max(a, b int) int {
 	return b
 }
 
+func abs(a int) int {
+	if a < 0 {
+		return -a
+	}
+	return a
+}
+
 func min64(a, b int64) int64 {
 	if (a < b) {
 		return a
@@ -34,6 +41,13 @@ func max64(a, b int64) int64 {
 		return a
 	}
 	return b
+}
+
+func abs64(a int64) int64 {
+	if a < 0 {
+		return -a
+	}
+	return a
 }
 
 func main() {
@@ -54,6 +68,11 @@ func main() {
 	defer writer.Flush()
 
 	solveInput(scanner, writer)
+}
+
+func ReadString(sc *bufio.Scanner) string {
+	sc.Scan()
+	return sc.Text()
 }
 
 func ReadInt64(sc *bufio.Scanner) int64 {
