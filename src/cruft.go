@@ -84,6 +84,15 @@ func ReadInt64(sc *bufio.Scanner) int64 {
 	return res
 }
 
+func ReadFloat64(sc *bufio.Scanner) float64 {
+	sc.Scan()
+	res, err := strconv.ParseFloat(sc.Text(), 64)
+	if err != nil {
+		panic(err)
+	}
+	return res
+}
+
 func ReadInt(sc *bufio.Scanner) int {
 	return int(ReadInt64(sc))
 }
