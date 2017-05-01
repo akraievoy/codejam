@@ -5,10 +5,53 @@ import (
 )
 
 func TestSimple(t *testing.T) {
-	// FIXME simple test case
-	out := solve(In{[]int16{2, 3, 5}})
+	out := solve(In{[]int{7, 2, 3, 5, 1}})
 
-	if out.sum != 10 {
-		t.Errorf("sum is not correct, expected %d, returned %d", 10, out.sum)
+	{
+		expected := 1;
+		actual := out.removed;
+
+		if actual != expected {
+			t.Errorf("out.removed is not correct: expected %v, returned %v", expected, actual)
+		}
+	}
+}
+
+func TestSimple01(t *testing.T) {
+	out := solve(In{[]int{6, 5, 4, 9, 1}})
+
+	{
+		expected := 1;
+		actual := out.removed;
+
+		if actual != expected {
+			t.Errorf("out.removed is not correct: expected %v, returned %v", expected, actual)
+		}
+	}
+}
+
+func TestSimple02(t *testing.T) {
+	out := solve(In{[]int{9, 5, 7, 8, 1, 2}})
+
+	{
+		expected := 1;
+		actual := out.removed;
+
+		if actual != expected {
+			t.Errorf("out.removed is not correct: expected %v, returned %v", expected, actual)
+		}
+	}
+}
+
+func TestSimple03(t *testing.T) {
+	out := solve(In{[]int{1, 2, 3, 4}})
+
+	{
+		expected := 2;
+		actual := out.removed;
+
+		if actual != expected {
+			t.Errorf("out.removed is not correct: expected %v, returned %v", expected, actual)
+		}
 	}
 }

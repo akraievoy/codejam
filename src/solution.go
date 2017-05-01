@@ -8,22 +8,31 @@ import (
 )
 
 type In struct {
-	// FIXME test case input structure
-	nums  []int16
+	nums  []int
 }
 
 type Out struct {
-	// FIXME test case output structure
-	sum   int32
+	removed   int
+}
+
+func compare(a, b int) int {
+	if (a < b) {
+		return -1
+	}
+	return 1
 }
 
 func solve(in In) (out Out) {
-	// FIXME actual solution
-	sum := int32(0)
-	for _, v := range in.nums {
-		sum += int32(v)
+	removed := 0
+
+	for i := 0; i < len(in.nums) - 2; i++ {
+		if compare(in.nums[i], in.nums[i+1]) == compare(in.nums[i+1], in.nums[i+2]) {
+			//fmt.Println(fmt.Sprintf("%v", in.nums[i + 1]))
+			removed++
+		}
 	}
-	return Out{sum}
+
+	return Out{removed}
 }
 
 func main() {
@@ -43,18 +52,16 @@ func main() {
 	var writer *bufio.Writer = bufio.NewWriter(os.Stdout)
 	defer writer.Flush()
 
-	//	FIXME read the in
-	size := int16(ReadInt(scanner))
-	nums := make([]int16, size)
+	size := ReadInt(scanner)
+	nums := make([]int, size)
 	for i := range nums {
-		nums[i] = int16(ReadInt(scanner))
+		nums[i] = ReadInt(scanner)
 	}
 	in := In{nums}
 
 	out := solve(in)
 
-	//	FIXME write the out
-	Writef(writer, "%d\n", out.sum)
+	Writef(writer, "%d\n", out.removed)
 }
 
 func ReadInt64(sc *bufio.Scanner) int64 {
@@ -70,66 +77,10 @@ func ReadInt(sc *bufio.Scanner) int {
 	return int(ReadInt64(sc))
 }
 
-func ReadFloat64(sc *bufio.Scanner) float64 {
-	sc.Scan()
-	res, err := strconv.ParseFloat(sc.Text(), 64)
-	if err != nil {
-		panic(err)
-	}
-	return res
-}
-
-func ReadString(sc *bufio.Scanner) string {
-	sc.Scan()
-	return sc.Text()
-}
-
 func Writef(writer *bufio.Writer, formatStr string, values ...interface{}) {
 	out := fmt.Sprintf(formatStr, values...)
 	_, err := writer.WriteString(out)
 	if err != nil {
 		panic(err)
 	}
-}
-
-func min(a, b int) int {
-	if (a < b) {
-		return a
-	}
-	return b
-}
-
-func max(a, b int) int {
-	if (a > b) {
-		return a
-	}
-	return b
-}
-
-func abs(a int) int {
-	if a < 0 {
-		return -a
-	}
-	return a
-}
-
-func min64(a, b int64) int64 {
-	if (a < b) {
-		return a
-	}
-	return b
-}
-
-func max64(a, b int64) int64 {
-	if (a > b) {
-		return a
-	}
-	return b
-}
-
-func abs64(a int64) int64 {
-	if a < 0 {
-		return -a
-	}
-	return a
 }
