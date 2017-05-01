@@ -70,6 +70,20 @@ func ReadInt(sc *bufio.Scanner) int {
 	return int(ReadInt64(sc))
 }
 
+func ReadFloat64(sc *bufio.Scanner) float64 {
+	sc.Scan()
+	res, err := strconv.ParseFloat(sc.Text(), 64)
+	if err != nil {
+		panic(err)
+	}
+	return res
+}
+
+func ReadString(sc *bufio.Scanner) string {
+	sc.Scan()
+	return sc.Text()
+}
+
 func Writef(writer *bufio.Writer, formatStr string, values ...interface{}) {
 	out := fmt.Sprintf(formatStr, values...)
 	_, err := writer.WriteString(out)
@@ -92,6 +106,13 @@ func max(a, b int) int {
 	return b
 }
 
+func abs(a int) int {
+	if a < 0 {
+		return -a
+	}
+	return a
+}
+
 func min64(a, b int64) int64 {
 	if (a < b) {
 		return a
@@ -104,4 +125,11 @@ func max64(a, b int64) int64 {
 		return a
 	}
 	return b
+}
+
+func abs64(a int64) int64 {
+	if a < 0 {
+		return -a
+	}
+	return a
 }
