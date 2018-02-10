@@ -8,17 +8,9 @@ import (
 	"sort"
 )
 
-var (
-	DEBUG=false
-)
-
 type Runner struct {
 	Height int32
 	Price  int64
-}
-
-func (r *Runner) String() string {
-	return fmt.Sprintf("%d@%d", r.Height, r.Price)
 }
 
 type In struct {
@@ -36,10 +28,6 @@ type Route struct {
 
 func (r *Route) Premium() int64 {
 	return r.Cost - int64(r.Height)
-}
-
-func (r *Route) String() string {
-	return fmt.Sprintf("%d\t%d\t%d", r.Height, r.Cost, r.Premium())
 }
 
 func MinByPremium(routes []Route) Route {
@@ -62,14 +50,7 @@ func solve(in In) (out Out) {
 
 	for pos, runner := range in.Runners {
 		if pos == 0 {
-			if DEBUG {
-				dumpRoutes("INIT", routesByHeightDesc)
-			}
 			continue // init above does what we need for step 0
-		}
-
-		if DEBUG {
-			fmt.Printf("\nRUNNER %v\n", &runner)
 		}
 
 		routeHighest := routesByHeightDesc[0]
@@ -85,9 +66,6 @@ func solve(in In) (out Out) {
 				}
 			routesByHeightDesc = routesByHeightDesc[:1]
 			routesByHeightDesc[0] = newRoute
-			if DEBUG {
-				dumpRoutes("HIGHEST NEW", routesByHeightDesc)
-			}
 			continue // processed
 		}
 
@@ -98,14 +76,8 @@ func solve(in In) (out Out) {
 			if ascendCost < routeHighest.Cost {
 				routesByHeightDesc[0] = Route{runner.Height, ascendCost}
 				routesByHeightDesc = routesByHeightDesc[:1]
-				if DEBUG {
-					dumpRoutes("HIGHEST UPDATE", routesByHeightDesc)
-				}
 			} else {
 				routesByHeightDesc = routesByHeightDesc[:1]
-				if DEBUG {
-					dumpRoutes("HIGHEST UPDATE NOOP", routesByHeightDesc)
-				}
 				continue //	can't be part of optimal route
 			}
 		} else if routeLowest.Height > runner.Height {
@@ -117,13 +89,7 @@ func solve(in In) (out Out) {
 						routeLowest.Cost + runner.Price + int64(routeLowest.Height-runner.Height),
 					}
 				routesByHeightDesc = append(routesByHeightDesc, newRoute)
-				if DEBUG {
-					dumpRoutes("LOWEST NEW", routesByHeightDesc)
-				}
 			} else {
-				if DEBUG {
-					dumpRoutes("LOWEST NEW NOOP", routesByHeightDesc)
-				}
 				continue // can't be part of optimal route
 			}
 		} else if routeLowest.Height == runner.Height {
@@ -134,13 +100,7 @@ func solve(in In) (out Out) {
 						routeLowest.Height,
 						routeLowest.Cost + runner.Price,
 					}
-				if DEBUG {
-					dumpRoutes("LOWEST SWAP", routesByHeightDesc)
-				}
 			} else {
-				if DEBUG {
-					dumpRoutes("LOWEST SWAP NOOP", routesByHeightDesc)
-				}
 				continue // can't be part of optimal route
 			}
 		} else {
@@ -164,14 +124,8 @@ func solve(in In) (out Out) {
 						}
 					routesByHeightDesc[routeIdx] = newRoute
 					routesByHeightDesc = routesByHeightDesc[:routeIdx+1]
-					if DEBUG {
-						dumpRoutes("MID SWAP", routesByHeightDesc)
-					}
 				} else {
 					routesByHeightDesc = routesByHeightDesc[:routeIdx+1]
-					if DEBUG {
-						dumpRoutes("MID SWAP NOOP", routesByHeightDesc)
-					}
 					continue // can't be part of optimal route
 				}
 			} else {
@@ -184,9 +138,6 @@ func solve(in In) (out Out) {
 
 				if minCost >= costDescent {
 					routesByHeightDesc = routesByHeightDesc[:routeIdx]
-					if DEBUG {
-						dumpRoutes("MID NEW NOOP", routesByHeightDesc)
-					}
 					continue // can't be part of optimal route
 				}
 
@@ -197,9 +148,6 @@ func solve(in In) (out Out) {
 					}
 
 				routesByHeightDesc = append(routesByHeightDesc[:routeIdx], newRoute)
-				if DEBUG {
-					dumpRoutes("MID NEW", routesByHeightDesc)
-				}
 			}
 		}
 	}
@@ -212,14 +160,6 @@ func solve(in In) (out Out) {
 	}
 	return Out{minTotalCost + int64(len(in.Runners))}
 }
-func dumpRoutes(action string, routesByHeightDesc []Route) {
-	routesByHeightDescStr := fmt.Sprintf("%s:\n", action)
-	for idx, route := range routesByHeightDesc {
-		routesByHeightDescStr += fmt.Sprintf("%d:\t%v\n", idx, &route)
-	}
-	fmt.Print(routesByHeightDescStr)
-}
-
 func main() {
 	var scanner *bufio.Scanner
 	if len(os.Args) > 1 {
@@ -272,20 +212,6 @@ func ReadInt(sc *bufio.Scanner) int {
 	return int(ReadInt64(sc))
 }
 
-func ReadFloat64(sc *bufio.Scanner) float64 {
-	sc.Scan()
-	res, err := strconv.ParseFloat(sc.Text(), 64)
-	if err != nil {
-		panic(err)
-	}
-	return res
-}
-
-func ReadString(sc *bufio.Scanner) string {
-	sc.Scan()
-	return sc.Text()
-}
-
 func Writef(writer *bufio.Writer, formatStr string, values ...interface{}) {
 	out := fmt.Sprintf(formatStr, values...)
 	_, err := writer.WriteString(out)
@@ -294,44 +220,9 @@ func Writef(writer *bufio.Writer, formatStr string, values ...interface{}) {
 	}
 }
 
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
-}
-
-func max(a, b int) int {
-	if a > b {
-		return a
-	}
-	return b
-}
-
-func abs(a int) int {
-	if a < 0 {
-		return -a
-	}
-	return a
-}
-
 func min64(a, b int64) int64 {
 	if a < b {
 		return a
 	}
 	return b
-}
-
-func max64(a, b int64) int64 {
-	if a > b {
-		return a
-	}
-	return b
-}
-
-func abs64(a int64) int64 {
-	if a < 0 {
-		return -a
-	}
-	return a
 }
