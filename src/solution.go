@@ -45,8 +45,7 @@ func solve(in In) (out Out) {
 	routesByHeightDesc[0] =
 		Route{
 			in.Runners[0].Height,
-			in.Runners[0].Price,
-		}
+			in.Runners[0].Price}
 
 	for pos, runner := range in.Runners {
 		if pos == 0 {
@@ -62,8 +61,7 @@ func solve(in In) (out Out) {
 			newRoute :=
 				Route{
 					runner.Height,
-					ascendRoute.Cost + runner.Price + int64(runner.Height-ascendRoute.Height),
-				}
+					ascendRoute.Cost + runner.Price + int64(runner.Height-ascendRoute.Height)}
 			routesByHeightDesc = routesByHeightDesc[:1]
 			routesByHeightDesc[0] = newRoute
 			continue // processed
@@ -86,8 +84,7 @@ func solve(in In) (out Out) {
 				newRoute :=
 					Route{
 						runner.Height,
-						routeLowest.Cost + runner.Price + int64(routeLowest.Height-runner.Height),
-					}
+						routeLowest.Cost + runner.Price + int64(routeLowest.Height-runner.Height)}
 				routesByHeightDesc = append(routesByHeightDesc, newRoute)
 			} else {
 				continue // can't be part of optimal route
@@ -98,8 +95,7 @@ func solve(in In) (out Out) {
 				routesByHeightDesc[len(routesByHeightDesc)-1] =
 					Route{
 						routeLowest.Height,
-						routeLowest.Cost + runner.Price,
-					}
+						routeLowest.Cost + runner.Price}
 			} else {
 				continue // can't be part of optimal route
 			}
@@ -109,8 +105,7 @@ func solve(in In) (out Out) {
 					len(routesByHeightDesc),
 					func(pos int) bool {
 						return routesByHeightDesc[pos].Height <= runner.Height
-					},
-				)
+					})
 			if routesByHeightDesc[routeIdx].Height == runner.Height {
 				ascendRoute := MinByPremium(routesByHeightDesc[:routeIdx+1])
 				ascendCost := ascendRoute.Cost + runner.Price + int64(runner.Height - ascendRoute.Height)
@@ -120,8 +115,7 @@ func solve(in In) (out Out) {
 					newRoute :=
 						Route{
 							runner.Height,
-							ascendCost,
-						}
+							ascendCost}
 					routesByHeightDesc[routeIdx] = newRoute
 					routesByHeightDesc = routesByHeightDesc[:routeIdx+1]
 				} else {
@@ -160,6 +154,7 @@ func solve(in In) (out Out) {
 	}
 	return Out{minTotalCost + int64(len(in.Runners))}
 }
+
 func main() {
 	var scanner *bufio.Scanner
 	if len(os.Args) > 1 {
