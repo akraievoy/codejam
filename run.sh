@@ -29,20 +29,24 @@ for TEST_IN in `ls -1 inout/ | grep '.in$' | sort`; do
   TEST_BASE=`echo $TEST_IN | sed -e 's/\.in$//g'`
   echo "running $TEST_IN -> $TEST_BASE.${CJ_TIME}.out..."
   time bin/${CJ_TASK} inout/$TEST_IN > inout/${TEST_BASE}.${CJ_TIME}.out
-  diff -y --suppress-common-lines inout/${TEST_BASE}.out inout/${TEST_BASE}.${CJ_TIME}.out
+  diff -y --suppress-common-lines inout/${TEST_BASE}.${CJ_TIME}.out inout/${TEST_BASE}.out
 done
 
-mkdir -p $CJ_HOME/$CJ_TASK/$CJ_TIME
-
+echo
 echo
 echo
 echo '----------============= ZIPPING SOLUTION =============----------'
 zip -r \
   $CJ_HOME/$CJ_TASK/$CJ_TIME/$CJ_TASK-$CJ_TIME.zip \
-  src
+  *.go
 
 unzip -l $CJ_HOME/$CJ_TASK/$CJ_TIME/$CJ_TASK-$CJ_TIME.zip
 
+echo
+echo
+echo '----------===========<[ READY FOR UPLOAD ]>===========----------'
+echo '----------==========<[[ READY FOR UPLOAD ]]>==========----------'
+echo '----------===========<[ READY FOR UPLOAD ]>===========----------'
 echo
 echo
 echo '----------============= LISTENING FOR DOWNLOADS =============----------'
