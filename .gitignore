@@ -6,4 +6,4 @@
 
 bin/template*
 bin/*_*
-inout/*.*_*.out
+inout/*/*.actual.out

@@ -3,55 +3,39 @@
 set -o nounset
 set -o errexit
 
-export CJ_HOME=${1-$HOME/Downloads/codejam}
+export GO_ROOT=/home/ak/bin/go-1.7.4
+export GO_PATH="$( pwd )"
+export CJ_TASK="$1"
+export CJ_TIME="$(date +%y%m%d_%H%M%S)"
 
-export CJ_TIME=`date +%y%m%d_%H%M%S`
+echo "
+--=[${CJ_TASK}]=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--
+go build: ROOT=${GO_ROOT} PATH=${GO_PATH}
+--=[${CJ_TASK}]=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--"
+bash -c "time ${GO_ROOT}/bin/go build -o bin/${CJ_TASK} src/${CJ_TASK}/Solution.go"
 
-export CJ_TASK=`git rev-parse --abbrev-ref HEAD | sed -Ee 's:/(go|java)$::g' | sed -Ee 's:[^/]+/::g'`
-
-echo
-echo
-echo '----------============= GO TEST =============----------'
-bash -c "GOPATH=`pwd`:$GOPATH && cd src && pwd && env | grep GOPATH && go test"
-
-echo
-echo
-echo '----------============= GO BUILD =============----------'
-bash -c "GOPATH=`pwd`:$GOPATH && cd src && pwd && go build -o ../bin/${CJ_TASK}"
-
-echo
-echo
-echo '----------============= SAMPLE IN/OUT FILES =============----------'
-for TEST_OUT in `ls -1 inout/ | grep -E '[0-9]+_[0-9]+.out$'` ; do
-  echo "deleting $TEST_OUT" && rm inout/$TEST_OUT
+for TEST_OUT in `ls -1 inout/${CJ_TASK}/ | grep -E '[0-9]+_[0-9]+.out$'` ; do
+    echo "deleting $TEST_OUT" && rm inout/${CJ_TASK}/$TEST_OUT
 done;
-for TEST_IN in `ls -1 inout/ | grep '.in$' | sort`; do
-  TEST_BASE=`echo $TEST_IN | sed -e 's/\.in$//g'`
-  echo "running $TEST_IN -> $TEST_BASE.${CJ_TIME}.out..."
-  time bin/${CJ_TASK} inout/$TEST_IN > inout/${TEST_BASE}.${CJ_TIME}.out
-  diff -y --suppress-common-lines inout/${TEST_BASE}.${CJ_TIME}.out inout/${TEST_BASE}.out
+
+for TEST_IN in `ls -1 inout/${CJ_TASK}/ | grep '.in$' | sort -n`; do
+    echo "
+    --=[${CJ_TASK}]=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--
+    Comparing output for ${TEST_IN}
+    --=[${CJ_TASK}]=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--"
+
+    TEST_BASE="$(echo $TEST_IN | sed -e 's/\.in$//g')"
+
+    time bin/${CJ_TASK} \
+        inout/${CJ_TASK}/$TEST_IN > \
+        inout/${CJ_TASK}/${TEST_BASE}.${CJ_TIME}.actual.out
+
+    diff -y --suppress-common-lines \
+        inout/${CJ_TASK}/${TEST_BASE}.out \
+        inout/${CJ_TASK}/${TEST_BASE}.${CJ_TIME}.actual.out
 done
 
-echo
-echo
-echo
-echo '----------============= ZIPPING SOLUTION =============----------'
-zip -r \
-  $CJ_HOME/$CJ_TASK/$CJ_TIME/$CJ_TASK-$CJ_TIME.zip \
-  *.go
-
-unzip -l $CJ_HOME/$CJ_TASK/$CJ_TIME/$CJ_TASK-$CJ_TIME.zip
-
-echo
-echo
-echo '----------===========<[ READY FOR UPLOAD ]>===========----------'
-echo '----------==========<[[ READY FOR UPLOAD ]]>==========----------'
-echo '----------===========<[ READY FOR UPLOAD ]>===========----------'
-echo
-echo
-echo '----------============= LISTENING FOR DOWNLOADS =============----------'
-echo '----------============= LISTENING FOR DOWNLOADS =============----------'
-echo '----------============= LISTENING FOR DOWNLOADS =============----------'
-echo watching for new downloads at $CJ_HOME/$CJ_TASK/$CJ_TIME && \
-  fileschanged --show=created --recursive --timeout=2 $CJ_HOME/$CJ_TASK/$CJ_TIME | \
-  xargs -L1 -iIN bash -c "if [[ IN = *.in ]] ; then echo IN && bin/${CJ_TASK} IN > IN.out ; fi"
+echo "
+--=[${CJ_TASK}]=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--
+READY FOR UPLOAD
+--=[${CJ_TASK}]=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--"
