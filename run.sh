@@ -54,26 +54,32 @@ for TEST_IN in `ls -1 inout/${CJ_TASK}/ | grep '.in$' | sort -n`; do
         inout/${CJ_TASK}/${TEST_BASE}.${CJ_TIME}.actual.out
 done
 
-echo -e "
+if which fileschanged ; then
+
+    echo -e "
 --=[\033[1;37m${CJ_TASK}\033[0m]=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--
  \033[1;36m*\033[0m creating solution archive -- required for pre-2018 versions of CodeJam
 --=[\033[1;37m${CJ_TASK}\033[0m]=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--"
-zip -r \
-  $CJ_TASK-$CJ_TIME.zip \
-  src/${CJ_TASK}
 
-unzip -l ${CJ_TASK}-$CJ_TIME.zip
+    zip -r \
+      $CJ_TASK-$CJ_TIME.zip \
+      src/${CJ_TASK}
 
-echo -e "
+    unzip -l ${CJ_TASK}-$CJ_TIME.zip
+
+    echo -e "
+--=[\033[1;37m${CJ_TASK}\033[0m]=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--
+    \033[1;32mecho watching for new inputs at inout/${CJ_TASK} -- for pre-2018 CodeJam\033[0m
+--=[\033[1;37m${CJ_TASK}\033[0m]=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--"
+
+    fileschanged --show=created --recursive --timeout=2 inout/${CJ_TASK} | \
+        xargs -L1 -iIN bash -c "if [[ IN = *.in ]] ; then echo IN && bin/${CJ_TASK} IN > IN.out ; fi"
+
+else
+
+    echo -e "
 --=[\033[1;37m${CJ_TASK}\033[0m]=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--
             \033[1;32m---================<[ READY FOR UPLOAD ]>================---\033[0m
 --=[\033[1;37m${CJ_TASK}\033[0m]=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--"
 
-if which fileschanged ; then
-    echo -e "
---=[\033[1;37m${CJ_TASK}\033[0m]=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--
-  \033[1;36m*\033[0m echo watching for new inputs at inout/${CJ_TASK} -- for pre-2018 CodeJam
---=[\033[1;37m${CJ_TASK}\033[0m]=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--"
-    fileschanged --show=created --recursive --timeout=2 inout/${CJ_TASK} | \
-        xargs -L1 -iIN bash -c "if [[ IN = *.in ]] ; then echo IN && bin/${CJ_TASK} IN > IN.out ; fi"
 fi
