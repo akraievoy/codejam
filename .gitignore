@@ -7,3 +7,4 @@
 bin/template*
 bin/*_*
 inout/*/*.actual.out
+*.zip
