@@ -32,10 +32,8 @@ type caseOutput struct {
 }
 
 func writeCaseOutput(writer *bufio.Writer, out caseOutput) {
-	writef(writer, "Case #%d:", 1+out.index)
 	//	FIXME write the out
-	writef(writer, " %d", out.sum)
-	writef(writer, "\n")
+	writef(writer, "Case #%d: %d\n", 1+out.index, out.sum)
 }
 
 func solveCase(in caseInput) caseOutput {

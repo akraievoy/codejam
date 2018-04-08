@@ -14,15 +14,16 @@ go build: ROOT=${GO_ROOT} PATH=${GO_PATH}
 --=[${CJ_TASK}]=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--"
 bash -c "time ${GO_ROOT}/bin/go build -o bin/${CJ_TASK} src/${CJ_TASK}/Solution.go"
 
-for TEST_OUT in `ls -1 inout/${CJ_TASK}/ | grep -E '[0-9]+_[0-9]+.out$'` ; do
+echo ""
+for TEST_OUT in `ls -1 inout/${CJ_TASK}/ | grep -E '[0-9]+_[0-9]+.actual.out$'` ; do
     echo "deleting $TEST_OUT" && rm inout/${CJ_TASK}/$TEST_OUT
 done;
 
 for TEST_IN in `ls -1 inout/${CJ_TASK}/ | grep '.in$' | sort -n`; do
     echo "
-    --=[${CJ_TASK}]=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--
+    --=[${CJ_TASK}]=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--
     Comparing output for ${TEST_IN}
-    --=[${CJ_TASK}]=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--"
+    --=[${CJ_TASK}]=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--"
 
     TEST_BASE="$(echo $TEST_IN | sed -e 's/\.in$//g')"
 
@@ -37,5 +38,7 @@ done
 
 echo "
 --=[${CJ_TASK}]=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--
-READY FOR UPLOAD
+        ================
+        READY FOR UPLOAD
+        ================
 --=[${CJ_TASK}]=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--=--"
