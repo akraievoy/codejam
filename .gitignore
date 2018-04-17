@@ -4,7 +4,6 @@
 .idea/dictionaries/*
 .idea/shelf
 
-bin/template*
-bin/*_*
+bin/
 inout/*/*.actual.out
 *.zip
