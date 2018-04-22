@@ -31,13 +31,13 @@ func (ufp *UnionFind) Reset() {
 
 func (ufp *UnionFind) validate(p uint32) {
 	n := uint32(len(ufp.parent))
-	if (p >= n) {
-		panic(fmt.Sprintf("index %d is not between 0 and %d", p, (n - 1)))
+	if p >= n {
+		panic(fmt.Sprintf("index %d is not between 0 and %d", p, n - 1))
 	}
 }
 
 func (ufp *UnionFind) Count() uint32 {
-	return ufp.count;
+	return ufp.count
 }
 
 func (ufp *UnionFind) Find(p uint32) uint32 {
@@ -53,7 +53,7 @@ func (ufp *UnionFind) Find(p uint32) uint32 {
 		p = newp
 	}
 
-	return root;
+	return root
 }
 
 func (ufp *UnionFind) Size(p uint32) uint32 {
@@ -61,18 +61,18 @@ func (ufp *UnionFind) Size(p uint32) uint32 {
 }
 
 func (ufp *UnionFind) Connected(p, q uint32) bool {
-	return ufp.Find(p) == ufp.Find(q);
+	return ufp.Find(p) == ufp.Find(q)
 }
 
 func (ufp *UnionFind) Union(p, q uint32) {
 	rootP := ufp.Find(p)
 	rootQ := ufp.Find(q)
 
-	if (rootP == rootQ) {
+	if rootP == rootQ {
 		return
 	}
 
-	if (ufp.size[rootP] < ufp.size[rootQ]) {
+	if ufp.size[rootP] < ufp.size[rootQ] {
 		ufp.parent[rootP] = rootQ
 		ufp.size[rootQ] += ufp.size[rootP]
 	} else {
@@ -80,5 +80,5 @@ func (ufp *UnionFind) Union(p, q uint32) {
 		ufp.size[rootP] += ufp.size[rootQ]
 	}
 
-	ufp.count -= 1;
+	ufp.count -= 1
 }

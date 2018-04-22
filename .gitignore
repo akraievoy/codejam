@@ -7,3 +7,8 @@
 bin/
 inout/*/*.actual.out
 *.zip
+
+gradlew
+gradlew.bat
+gradle/*
+codejam-java.iws

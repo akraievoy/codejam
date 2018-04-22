@@ -7,7 +7,7 @@ import (
 )
 
 func TestSimple(t *testing.T) {
-	var rnd = rand.NewSource(time.Now().UnixNano())
+	rnd := rand.New(rand.NewSource(time.Now().UnixNano()))
 	if false {
 		rnd.Int63()
 	}
