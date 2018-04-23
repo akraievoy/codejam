@@ -1,5 +1,6 @@
 package algo
 
+// http://rosettacode.org/wiki/Longest_common_subsequence#Dynamic_Programming_2
 func LCS(a, b string) string {
 	arunes := []rune(a)
 	brunes := []rune(b)
