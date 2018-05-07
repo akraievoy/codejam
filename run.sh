@@ -18,21 +18,21 @@ if [ "${GOROOT-}" = "" ]; then
     export GOROOT=/home/ak/bin/go-1.7.4
 fi
 
-export GO_PATH="$( pwd )"
+export GOPATH="$( pwd )"
 export CJ_TASK="$( echo $1 | sed -e 's:^src/::g' | sed -Ee 's:/$::g' )"
 export CJ_TIME="$(date +%y%m%d_%H%M%S)"
 
 echo -e "
 --=[\033[1;37m${CJ_TASK}\033[0m]=--
- \033[1;36m*\033[0m go test: GOROOT=${GOROOT} GO_PATH=${GO_PATH}
+ \033[1;36m*\033[0m go test: GOROOT=${GOROOT} GOPATH=${GOPATH}
 --=[\033[1;37m${CJ_TASK}\033[0m]=--"
-bash -c "cd src/${CJ_TASK}/ && time ${GOROOT}/bin/go test"
+bash -c "GOROOT=${GOROOT} GOPATH=${GOPATH} cd src/${CJ_TASK}/ && time ${GOROOT}/bin/go test"
 
 echo -e "
 --=[\033[1;37m${CJ_TASK}\033[0m]=--
- \033[1;36m*\033[0m go build: GOROOT=${GOROOT} GO_PATH=${GO_PATH}
+ \033[1;36m*\033[0m go build: GOROOT=${GOROOT} GOPATH=${GOPATH}
 --=[\033[1;37m${CJ_TASK}\033[0m]=--"
-bash -c "time ${GOROOT}/bin/go build -o bin/${CJ_TASK} src/${CJ_TASK}/Solution.go"
+bash -c "GOROOT=${GOROOT} GOPATH=${GOPATH} time ${GOROOT}/bin/go build -o bin/${CJ_TASK} src/${CJ_TASK}/Solution.go"
 
 echo ""
 for TEST_OUT in `ls -1 inout/${CJ_TASK}/ | grep -E '[0-9]+_[0-9]+.actual.out$'` ; do
