@@ -1,4 +1,4 @@
-package hr_woc36_20_revised_russian_roulette
+package main
 
 import (
 	"bufio"

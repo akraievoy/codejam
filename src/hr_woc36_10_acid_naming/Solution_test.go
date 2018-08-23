@@ -1,4 +1,4 @@
-package hr_woc36_10_acid_naming
+package main
 
 import (
 	"testing"
