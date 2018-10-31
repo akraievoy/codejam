@@ -3,85 +3,61 @@
 set -o nounset
 set -o errexit
 
+function pretty_echo {
+    local CAPTION=$1
+    local MESSAGE=$2
+    local COLOR=${3-blue}
+    if [ "$COLOR" == "green" ]; then
+        echo -e "\033[1;37m${CAPTION}\033[0m :: \033[1;32m${MESSAGE}\033[0m"
+    else
+        echo -e "\033[1;37m${CAPTION}\033[0m :: \033[1;36m${MESSAGE}\033[0m"
+    fi
+}
+
+clear
+pretty_echo "INIT" "DELETING TEST OUTPUTS" "green"
+for TEST_OUT in `find -iname '*.actual.out'` ; do
+    rm -v ${TEST_OUT}
+done;
+echo
+
 if [ "${1-}" = "" ]; then
     echo "Usage:
-    run.sh TASK_NAME
+    run.sh TASK_RELPATH
 
-Valid values for TASK_NAME are: "
+Valid values for TASK_RELPATH are: "
     find src -type d | tail -n +2 | sed -E 's/^/ * /'
     exit 1;
 fi
-
-clear
 
 if [ "${GOROOT-}" = "" ]; then
     export GOROOT=/home/ak/bin/go-1.7.4
 fi
 
 export GOPATH="$( pwd )"
-export CJ_TASK="$( echo $1 | sed -e 's:^src/::g' | sed -Ee 's:/$::g' )"
+TASK_RELPATH=$1
+TASK_BINARY="$( echo $1 | sed -e 's:^src/::g' | sed -Ee 's:/$::g' )"
+
 export CJ_TIME="$(date +%y%m%d_%H%M%S)"
 
-echo -e "
---=[\033[1;37m${CJ_TASK}\033[0m]=--
- \033[1;36m*\033[0m go test: GOROOT=${GOROOT} GOPATH=${GOPATH}
---=[\033[1;37m${CJ_TASK}\033[0m]=--"
-bash -c "GOROOT=${GOROOT} GOPATH=${GOPATH} cd src/${CJ_TASK}/ && time ${GOROOT}/bin/go test"
+pretty_echo "${TASK_RELPATH}" "go test with GOROOT=${GOROOT} GOPATH=${GOPATH}"
+bash -c "GOROOT=${GOROOT} && GOPATH=${GOPATH} && cd ${TASK_RELPATH} && time ${GOROOT}/bin/go test"
 
-echo -e "
---=[\033[1;37m${CJ_TASK}\033[0m]=--
- \033[1;36m*\033[0m go build: GOROOT=${GOROOT} GOPATH=${GOPATH}
---=[\033[1;37m${CJ_TASK}\033[0m]=--"
-bash -c "GOROOT=${GOROOT} GOPATH=${GOPATH} time ${GOROOT}/bin/go build -o bin/${CJ_TASK} src/${CJ_TASK}/Solution.go"
+pretty_echo "${TASK_RELPATH}" "go build with GOROOT=${GOROOT} GOPATH=${GOPATH}"
+bash -c "GOROOT=${GOROOT} && GOPATH=${GOPATH} && time ${GOROOT}/bin/go build -o bin/${TASK_BINARY} ${TASK_RELPATH}/Solution.go"
 
-echo ""
-for TEST_OUT in `ls -1 inout/${CJ_TASK}/ | grep -E '[0-9]+_[0-9]+.actual.out$'` ; do
-    echo "deleting $TEST_OUT" && rm inout/${CJ_TASK}/$TEST_OUT
-done;
-
-for TEST_IN in `ls -1 inout/${CJ_TASK}/ | grep '.in$' | sort -n`; do
-    echo -e "
-    --=[\033[1;37m${CJ_TASK}\033[0m]=--
-         \033[36m*\033[0m Comparing output for ${TEST_IN}
-    --=[\033[1;37m${CJ_TASK}\033[0m]=--"
+for TEST_IN in `find ${TASK_RELPATH} -iname '*.in' | sort -n`; do
+    pretty_echo "${TASK_RELPATH}" "Comparing output for ${TEST_IN}"
 
     TEST_BASE="$(echo $TEST_IN | sed -e 's/\.in$//g')"
 
-    time bin/${CJ_TASK} \
-        inout/${CJ_TASK}/$TEST_IN > \
-        inout/${CJ_TASK}/${TEST_BASE}.${CJ_TIME}.actual.out
+    time bin/${TASK_BINARY} \
+        $TEST_IN > \
+        ${TEST_BASE}.${CJ_TIME}.actual.out
 
     diff -y --suppress-common-lines \
-        inout/${CJ_TASK}/${TEST_BASE}.out \
-        inout/${CJ_TASK}/${TEST_BASE}.${CJ_TIME}.actual.out
+        ${TEST_BASE}.out \
+        ${TEST_BASE}.${CJ_TIME}.actual.out
 done
 
-if which fileschanged ; then
-
-    echo -e "
---=[\033[1;37m${CJ_TASK}\033[0m]=--
- \033[1;36m*\033[0m creating solution archive -- required for pre-2018 versions of CodeJam
---=[\033[1;37m${CJ_TASK}\033[0m]=--"
-
-    zip -r \
-      $CJ_TASK-$CJ_TIME.zip \
-      src/${CJ_TASK}
-
-    unzip -l ${CJ_TASK}-$CJ_TIME.zip
-
-    echo -e "
---=[\033[1;37m${CJ_TASK}\033[0m]=--
-    \033[1;32mecho watching for new inputs at inout/${CJ_TASK} -- for pre-2018 CodeJam\033[0m
---=[\033[1;37m${CJ_TASK}\033[0m]=--"
-
-    fileschanged --show=created --recursive --timeout=2 inout/${CJ_TASK} | \
-        xargs -L1 -iIN bash -c "if [[ IN = *.in ]] ; then echo IN && bin/${CJ_TASK} IN > IN.out ; fi"
-
-else
-
-    echo -e "
---=[\033[1;37m${CJ_TASK}\033[0m]=--
-  \033[1;32m---=<[ READY FOR UPLOAD ]>=---\033[0m
---=[\033[1;37m${CJ_TASK}\033[0m]=--"
-
-fi
+pretty_echo "${TASK_RELPATH}" "READY FOR UPLOAD" "green"
