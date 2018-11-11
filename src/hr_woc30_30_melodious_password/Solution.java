@@ -4,7 +4,7 @@ import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.Scanner;
 
-public class Main {
+public class Solution {
 
   public final static String VOWELS = "euioa";
   public final static String CONSONANTS = "qwrtpsdfghjklzxcvbnm";

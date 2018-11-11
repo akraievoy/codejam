@@ -3,7 +3,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.*;
 
-public class Main {
+public class Solution {
   private static final int[] PRIMES =
     {
       2, 3, 5, 7, 11, 13, 17, 19, 23, 29,

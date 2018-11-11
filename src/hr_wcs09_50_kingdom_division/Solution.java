@@ -2,7 +2,7 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Scanner;
 
-public class Main {
+public class Solution {
   private final static int MOD = 1000000007;
   private final static BigInteger TWO = BigInteger.valueOf(2);
 

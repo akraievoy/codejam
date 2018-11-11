@@ -2,7 +2,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Scanner;
 
-public class Main {
+public class Solution {
   public static final Comparator<String> elemLenOrder =
     (e1, e2) -> Integer.compare(e1.length(), e2.length());
 

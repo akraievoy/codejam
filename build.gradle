@@ -1,5 +1,5 @@
-ext.TASK_RELPATH=project.properties['TASK_RELPATH'] ?: 'src/cj13_1b_a_osmos'
-ext.TASK_BINARY=project.properties['TASK_BINARY'] ?: 'cj13_1b_a_osmos'
+ext.TASK_RELPATH=project.properties['TASK_RELPATH'] ?: 'src/hr_woc30_70_modular_queries_java'
+ext.TASK_BINARY=project.properties['TASK_BINARY'] ?: 'hr_woc30_70_modular_queries_java'
 ext.TASK_MAIN=project.properties['TASK_MAIN'] ?: 'Main'
 
 apply plugin: 'java'
