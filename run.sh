@@ -52,7 +52,7 @@ if [[ "${JAM_WITH}" == "go" ]] ; then
   bash -c "GOROOT=${GOROOT} && GOPATH=${GOPATH} && cd ${TASK_RELPATH} && time ${GOROOT}/bin/go test"
 
   pretty_echo "${TASK_RELPATH}" "go build with GOROOT=${GOROOT} GOPATH=${GOPATH}"
-  bash -c "GOROOT=${GOROOT} && GOPATH=${GOPATH} && time ${GOROOT}/bin/go build -o bin/${TASK_BINARY} ${TASK_RELPATH}/Solution.go"
+  bash -c "GOROOT=${GOROOT} && GOPATH=${GOPATH} && time ${GOROOT}/bin/go build -o bin/${TASK_BINARY} ${TASK_RELPATH}/solution.go"
 elif [[ "${JAM_WITH}" == "java" ]] ; then
   pretty_echo "${TASK_RELPATH}" "gradle clean test jar"
   if test -f "${TASK_RELPATH}/Solution.java" ; then
