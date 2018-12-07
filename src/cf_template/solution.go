@@ -42,7 +42,7 @@ func solveCase(in caseInput) caseOutput {
 	sum2 := int(0)
 	for i, v := range in.nums {
 		sum2 += int(v)
-		if sum2 * 2 >= sum {
+		if sum2*2 >= sum {
 			return caseOutput{i + 1}
 		}
 	}
@@ -68,6 +68,7 @@ func main() {
 		scanner = bufio.NewScanner(os.Stdin)
 	}
 	scanner.Split(bufio.ScanWords)
+	scanner.Buffer(make([]byte, 0, 1024*1024), 1024*1024)
 
 	var writer = bufio.NewWriter(os.Stdout)
 	defer writer.Flush()
@@ -79,12 +80,18 @@ func main() {
 //	TODO wipe unused methods before submitting
 
 func readString(sc *bufio.Scanner) string {
-	sc.Scan()
+	if !sc.Scan() {
+		panic("failed to scan next token")
+	}
+
 	return sc.Text()
 }
 
 func readInt64(sc *bufio.Scanner) int64 {
-	sc.Scan()
+	if !sc.Scan() {
+		panic("failed to scan next token")
+	}
+
 	res, err := strconv.ParseInt(sc.Text(), 10, 64)
 	if err != nil {
 		panic(err)
