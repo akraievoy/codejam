@@ -91,7 +91,7 @@ for TEST_IN in `find ${TASK_RELPATH} -iname '*.in' | sort -n`; do
       exit 1
     fi
 
-    diff -y --suppress-common-lines  --ignore-all-space \
+    diff -y  --ignore-all-space \
         ${TEST_BASE}.out \
         ${TEST_BASE}.${CJ_TIME}.actual.out
 done
