@@ -2,10 +2,9 @@ package main
 
 import (
 	"bufio"
-	"os"
-	"runtime"
-	"strconv"
 	"fmt"
+	"os"
+	"strconv"
 )
 
 type caseInput struct {
@@ -46,45 +45,10 @@ func solveCase(in caseInput) caseOutput {
 }
 
 //	everything below is reusable boilerplate
-//		TODO remove either solveSequential or solveParallel
 func solveSequential(scanner *bufio.Scanner, writer *bufio.Writer) {
 	caseCount := readInt(scanner)
 	for index := 0; index < caseCount; index++ {
 		writeCaseOutput(writer, solveCase(readCaseInput(scanner, index)))
-	}
-}
-
-func solveParallel(scanner *bufio.Scanner, writer *bufio.Writer) {
-	caseCount := readInt(scanner)
-
-	cores := runtime.NumCPU()
-	var ins = make(chan caseInput, cores)
-	var outs = make(chan caseOutput, caseCount)
-	for t := 0; t < cores; t++ {
-		go solveFromChannel(ins, outs)
-	}
-
-	outsSlice := make([]caseOutput, caseCount)
-	for index := 0; index < caseCount; index++ {
-		in := readCaseInput(scanner, index)
-		ins <- in
-	}
-	close(ins)
-
-	for index := 0; index < caseCount; index++ {
-		out := <-outs
-		outsSlice[out.index] = out
-	}
-	close(outs)
-
-	for _, out := range outsSlice {
-		writeCaseOutput(writer, out)
-	}
-}
-
-func solveFromChannel(ins <-chan caseInput, outs chan<- caseOutput) {
-	for in := range ins {
-		outs <- solveCase(in)
 	}
 }
 
@@ -101,6 +65,7 @@ func main() {
 		scanner = bufio.NewScanner(os.Stdin)
 	}
 	scanner.Split(bufio.ScanWords)
+	scanner.Buffer(make([]byte, 0, 1024*1024), 1024*1024)
 
 	var writer = bufio.NewWriter(os.Stdout)
 	defer writer.Flush()
@@ -112,12 +77,18 @@ func main() {
 //	TODO wipe unused methods before submitting
 
 func readString(sc *bufio.Scanner) string {
-	sc.Scan()
+	if !sc.Scan() {
+		panic("failed to scan next token")
+	}
+
 	return sc.Text()
 }
 
 func readInt64(sc *bufio.Scanner) int64 {
-	sc.Scan()
+	if !sc.Scan() {
+		panic("failed to scan next token")
+	}
+
 	res, err := strconv.ParseInt(sc.Text(), 10, 64)
 	if err != nil {
 		panic(err)
