@@ -1,24 +1,47 @@
 package main
 
 import (
+	"bufio"
+	"bytes"
+	"fmt"
+	"strings"
 	"testing"
 	"time"
 	"math/rand"
 )
 
 func TestSimple(t *testing.T) {
-	var rnd = rand.NewSource(time.Now().UnixNano())
-	if false {
-		rnd.Int63()
-	}
+	seed := time.Now().UnixNano()
+	fmt.Printf("my seed is %d\n", seed)
+	var src = rand.NewSource(seed)
+	var rnd = rand.New(src)
 
-	// FIXME simple test case
-	out := solveCase(caseInput{3, []int16{2, 3, 5}})
+	a := rnd.Int31n(100)
+	b := rnd.Int31n(100)
+	c := rnd.Int31n(100)
 
-	if out.index != 3 {
-		t.Errorf("index is not retained, expected %d, returned %d", 3, out.index)
+	input := fmt.Sprintf("3\n%d %d %d", a, b, c)
+	outputExpected := fmt.Sprintf("Case #3: %d\n", a+b+c)
+
+	j, closeResFunc := JamNewMock(input)
+	solveOne(j, 3)
+	res := closeResFunc()
+
+	if res != outputExpected {
+		t.Errorf("sum is not correct, expected %d, returned %s", a+b+c, res)
 	}
-	if out.sum != 10 {
-		t.Errorf("sum is not correct, expected %d, returned %d", 10, out.sum)
+}
+
+func JamNewMock(input string) (Jam, func() string) {
+	var scanner = bufio.NewScanner(strings.NewReader(input))
+	scanner.Split(bufio.ScanWords)
+	scanner.Buffer(make([]byte, 0, 1024*1024), 1024*1024)
+
+	b := new(bytes.Buffer)
+	var writer = bufio.NewWriter(b)
+	jam := &jam{scanner, writer}
+	return jam, func() string {
+		jam.Close()
+		return b.String()
 	}
 }

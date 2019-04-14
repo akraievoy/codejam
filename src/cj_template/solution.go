@@ -7,89 +7,55 @@ import (
 	"strconv"
 )
 
-type caseInput struct {
-	index int64
-	// FIXME test case input structure
-	nums []int16
-}
-
-//	FIXME read the input
-func readCaseInput(j Jam, index int64) caseInput {
-	size := int16(j.Ri())
-	nums := make([]int16, size)
-	for i := range nums {
-		nums[i] = int16(j.Ri())
-	}
-	in := caseInput{index, nums}
-	return in
-}
-
-type caseOutput struct {
-	index int64
-	// FIXME test case output structure
-	sum int32
-}
-
-func writeCaseOutput(j Jam, out caseOutput) {
-	//	FIXME write the out
-	j.W("Case #%d: %d\n", 1+out.index, out.sum)
-}
-
-func solveCase(in caseInput) caseOutput {
-	// FIXME actual solution
+func solveOne(j Jam, t int64) {
+	size := int16(j.Int())
 	sum := int32(0)
-	for _, v := range in.nums {
-		sum += int32(v)
+	for i := int16(0); i < size; i++ {
+		sum += int32(j.Int())
 	}
-	return caseOutput{in.index, sum}
+	j.P("Case #%d: %d\n", t, sum)
 }
 
-//	everything below is reusable boilerplate
-func solveSequential(j Jam) {
-	caseCount := j.Ri()
-	for index := int64(0); index < caseCount; index++ {
-		writeCaseOutput(j, solveCase(readCaseInput(j, index)))
+func solveAll(j Jam) {
+	_, _ = fmt.Fprintf(os.Stderr, "started")
+	T := j.Int()
+	_, _ = fmt.Fprintf(os.Stderr, "%d tests", T)
+	for t := int64(1); t <= T; t++ {
+		solveOne(j, t)
 	}
 }
 
 func main() {
-	var scanner *bufio.Scanner
+	jam, closeFunc := JamNew()
+	defer closeFunc()
+	solveAll(jam)
+}
+
+type Jam interface {
+	Scanner() *bufio.Scanner
+	Writer() *bufio.Writer
+	Close()
+
+	Str() string
+	Int() int64
+	Float() float64
+
+	P(format string, values ...interface{})
+	PF(format string, values ...interface{})
+}
+
+func JamNew() (Jam, func()) {
 	if len(os.Args) > 1 {
-		reader, err := os.Open(os.Args[1])
-		if err != nil {
-			panic(err)
-		}
-		defer func() {
-			if err := reader.Close(); err != nil {
-				panic(err)
-			}
-		}()
-		scanner = bufio.NewScanner(reader)
-	} else {
-		scanner = bufio.NewScanner(os.Stdin)
+		panic("running with input file path is not supported")
 	}
+
+	var scanner = bufio.NewScanner(os.Stdin)
 	scanner.Split(bufio.ScanWords)
 	scanner.Buffer(make([]byte, 0, 1024*1024), 1024*1024)
 
 	var writer = bufio.NewWriter(os.Stdout)
-	defer func() {
-		if err := writer.Flush(); err != nil {
-			panic(err)
-		}
-	}()
-
-	solveSequential(&jam{scanner, writer})
-}
-
-type Jam interface {
-	Sc() *bufio.Scanner
-	Wr() *bufio.Writer
-
-	Rs() string
-	Ri() int64
-	Rf() float64
-
-	W(format string, values ...interface{})
+	jam := &jam{scanner, writer}
+	return jam, jam.Close
 }
 
 type jam struct {
@@ -97,15 +63,21 @@ type jam struct {
 	wr *bufio.Writer
 }
 
-func (j *jam) Sc() *bufio.Scanner {
+func (j *jam) Close() {
+	if err := j.wr.Flush(); err != nil {
+		panic(err)
+	}
+}
+
+func (j *jam) Scanner() *bufio.Scanner {
 	return j.sc
 }
 
-func (j *jam) Wr() *bufio.Writer {
+func (j *jam) Writer() *bufio.Writer {
 	return j.wr
 }
 
-func (j *jam) Rs() string {
+func (j *jam) Str() string {
 	if !j.sc.Scan() {
 		panic("failed to scan next token")
 	}
@@ -113,7 +85,7 @@ func (j *jam) Rs() string {
 	return j.sc.Text()
 }
 
-func (j *jam) Ri() int64 {
+func (j *jam) Int() int64 {
 	if !j.sc.Scan() {
 		panic("failed to scan next token")
 	}
@@ -123,10 +95,13 @@ func (j *jam) Ri() int64 {
 		panic(err)
 	}
 
+	_, _ = fmt.Fprintf(os.Stderr, "scanned %d", res)
+	_ = os.Stderr.Sync()
+
 	return res
 }
 
-func (j *jam) Rf() float64 {
+func (j *jam) Float() float64 {
 	j.sc.Scan()
 	res, err := strconv.ParseFloat(j.sc.Text(), 64)
 	if err != nil {
@@ -135,10 +110,19 @@ func (j *jam) Rf() float64 {
 	return res
 }
 
-func (j *jam) W(format string, values ...interface{}) {
-	out := fmt.Sprintf(format, values...)
-	_, err := j.wr.WriteString(out)
+func (j *jam) P(format string, values ...interface{}) {
+	_, err := fmt.Fprintf(j.wr, format, values...)
 	if err != nil {
+		panic(err)
+	}
+}
+
+func (j *jam) PF(format string, values ...interface{}) {
+	_, err := fmt.Fprintf(j.wr, format, values...)
+	if err != nil {
+		panic(err)
+	}
+	if err = j.wr.Flush(); err != nil {
 		panic(err)
 	}
 }

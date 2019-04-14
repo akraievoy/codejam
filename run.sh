@@ -80,8 +80,8 @@ for TEST_IN in `find ${TASK_RELPATH} -iname '*.in' | sort -n`; do
 
     if [[ "${JAM_WITH}" == "go" ]] ; then
         time bin/${TASK_BINARY} \
-            $TEST_IN > \
-            ${TEST_BASE}.${CJ_TIME}.actual.out
+            <$TEST_IN \
+            >${TEST_BASE}.${CJ_TIME}.actual.out
     elif [[ "${JAM_WITH}" == "java" ]] ; then
         time java -jar build/libs/${TASK_BINARY}-1.1.jar \
             < $TEST_IN \
