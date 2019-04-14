@@ -7,48 +7,64 @@ import (
 	"strconv"
 )
 
-type caseInput struct {
-	index int64
-	// FIXME test case input structure
-	nums []int16
-}
-
-//	FIXME read the input
-func readCaseInput(j Jam, index int64) caseInput {
-	size := int16(j.Ri())
-	nums := make([]int16, size)
-	for i := range nums {
-		nums[i] = int16(j.Ri())
-	}
-	in := caseInput{index, nums}
-	return in
-}
-
-type caseOutput struct {
-	index int64
-	// FIXME test case output structure
-	sum int32
-}
-
-func writeCaseOutput(j Jam, out caseOutput) {
-	//	FIXME write the out
-	j.W("Case #%d: %d\n", 1+out.index, out.sum)
-}
-
-func solveCase(in caseInput) caseOutput {
-	// FIXME actual solution
-	sum := int32(0)
-	for _, v := range in.nums {
-		sum += int32(v)
-	}
-	return caseOutput{in.index, sum}
-}
-
-//	everything below is reusable boilerplate
 func solveSequential(j Jam) {
-	caseCount := j.Ri()
-	for index := int64(0); index < caseCount; index++ {
-		writeCaseOutput(j, solveCase(readCaseInput(j, index)))
+	T, _, M := j.Ri(), j.Ri(), j.Ri()
+	modulos := []int64{17,16,13,11,9,7,5}
+	remainders := make([]int64, len(modulos))
+	for t := int64(0); t < T; t++ {
+		for moduloI, m := range modulos {
+			for i := 0; i < 18; i++ {
+				if i == 0 {
+					j.W("%d", m)
+				} else {
+					j.W(" %d", m)
+				}
+			}
+			j.W("\n")
+			j.Fl()
+
+			remRes := int64(0)
+			for i := 0; i < 18; i++ {
+				rem := j.Ri()
+				if rem < 0 {
+					panic("judge does not want us anymore")
+				}
+				remRes = ( remRes + rem ) % m
+			}
+			remainders[moduloI] = remRes
+		}
+
+		foundM := false
+		for m := remainders[0]; m <= M; m += modulos[0] {
+			valid := true
+			for moduloI, modulo := range modulos {
+				if moduloI == 0 {
+					continue
+				}
+				if m % modulo != remainders[moduloI] {
+					valid = false
+					break
+				}
+			}
+			if !valid {
+				continue
+			}
+			foundM = true
+
+			j.W("%d\n", m)
+			j.Fl()
+		}
+
+		if !foundM {
+			panic("failed to recover m")
+		}
+
+		testCaseReply := j.Rs()
+		if testCaseReply == "1" {
+			// cool we're still on track
+		} else {
+			panic(testCaseReply)
+		}
 	}
 }
 
@@ -84,6 +100,7 @@ func main() {
 type Jam interface {
 	Sc() *bufio.Scanner
 	Wr() *bufio.Writer
+	Fl()
 
 	Rs() string
 	Ri() int64
@@ -103,6 +120,12 @@ func (j *jam) Sc() *bufio.Scanner {
 
 func (j *jam) Wr() *bufio.Writer {
 	return j.wr
+}
+
+func (j *jam) Fl() {
+	if err := j.wr.Flush(); err != nil {
+		panic(err)
+	}
 }
 
 func (j *jam) Rs() string {

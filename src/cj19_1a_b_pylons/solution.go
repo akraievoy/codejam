@@ -7,48 +7,66 @@ import (
 	"strconv"
 )
 
-type caseInput struct {
-	index int64
-	// FIXME test case input structure
-	nums []int16
-}
-
-//	FIXME read the input
-func readCaseInput(j Jam, index int64) caseInput {
-	size := int16(j.Ri())
-	nums := make([]int16, size)
-	for i := range nums {
-		nums[i] = int16(j.Ri())
+func fill(R, C int64, p func(ri, ci int64)) {
+	for c := int64(0); c < C; c++ {
+		for r := int64(0); r < R; r++ {
+			rs := r
+			cs := c
+			if R == 4 && (c+2 < C && c%2 > 0) {
+				rs = r ^ 1
+			}
+			if R == C && R % 2 > 0 || C == R + 2 {
+				if c == C - 2 {
+					cs = C - 1
+				} else if c == C - 1 {
+					cs = C - 2
+				}
+			}
+			if rs%2 == 0 {
+				p(rs, (cs+2)%C)
+			} else {
+				p(rs, cs)
+			}
+		}
 	}
-	in := caseInput{index, nums}
-	return in
 }
 
-type caseOutput struct {
-	index int64
-	// FIXME test case output structure
-	sum int32
-}
-
-func writeCaseOutput(j Jam, out caseOutput) {
-	//	FIXME write the out
-	j.W("Case #%d: %d\n", 1+out.index, out.sum)
-}
-
-func solveCase(in caseInput) caseOutput {
-	// FIXME actual solution
-	sum := int32(0)
-	for _, v := range in.nums {
-		sum += int32(v)
-	}
-	return caseOutput{in.index, sum}
-}
-
-//	everything below is reusable boilerplate
 func solveSequential(j Jam) {
-	caseCount := j.Ri()
-	for index := int64(0); index < caseCount; index++ {
-		writeCaseOutput(j, solveCase(readCaseInput(j, index)))
+	T := j.Ri()
+	for t := int64(0); t < T; t++ {
+		R, C := j.Ri(), j.Ri()
+		transpose := false
+		if R > C {
+			transpose = true
+			R, C = C, R
+		}
+
+		var p = func(ri, ci int64) {
+			if transpose {
+				j.W("%d %d\n", ci+1, ri+1)
+			} else {
+				j.W("%d %d\n", ri+1, ci+1)
+			}
+		}
+
+		if R == 2 {
+			if C < 5 {
+				j.W("Case #%d: IMPOSSIBLE\n", 1+t)
+			} else {
+				j.W("Case #%d: POSSIBLE\n", 1+t)
+				fill(R, C, p)
+			}
+		} else if R == 3 {
+			if C == 3 {
+				j.W("Case #%d: IMPOSSIBLE\n", 1+t)
+			} else {
+				j.W("Case #%d: POSSIBLE\n", 1+t)
+				fill(R, C, p)
+			}
+		} else {
+			j.W("Case #%d: POSSIBLE\n", 1+t)
+			fill(R, C, p)
+		}
 	}
 }
 
@@ -141,44 +159,6 @@ func (j *jam) W(format string, values ...interface{}) {
 	if err != nil {
 		panic(err)
 	}
-}
-
-//	GoLang shorthand methods for math go below
-//	TODO wipe unused methods before submitting
-
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
-}
-
-func max(a, b int) int {
-	if a > b {
-		return a
-	}
-	return b
-}
-
-func abs(a int) int {
-	if a < 0 {
-		return -a
-	}
-	return a
-}
-
-func min64(a, b int64) int64 {
-	if a < b {
-		return a
-	}
-	return b
-}
-
-func max64(a, b int64) int64 {
-	if a > b {
-		return a
-	}
-	return b
 }
 
 func abs64(a int64) int64 {

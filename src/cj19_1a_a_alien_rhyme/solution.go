@@ -7,48 +7,52 @@ import (
 	"strconv"
 )
 
-type caseInput struct {
-	index int64
-	// FIXME test case input structure
-	nums []int16
-}
-
-//	FIXME read the input
-func readCaseInput(j Jam, index int64) caseInput {
-	size := int16(j.Ri())
-	nums := make([]int16, size)
-	for i := range nums {
-		nums[i] = int16(j.Ri())
-	}
-	in := caseInput{index, nums}
-	return in
-}
-
-type caseOutput struct {
-	index int64
-	// FIXME test case output structure
-	sum int32
-}
-
-func writeCaseOutput(j Jam, out caseOutput) {
-	//	FIXME write the out
-	j.W("Case #%d: %d\n", 1+out.index, out.sum)
-}
-
-func solveCase(in caseInput) caseOutput {
-	// FIXME actual solution
-	sum := int32(0)
-	for _, v := range in.nums {
-		sum += int32(v)
-	}
-	return caseOutput{in.index, sum}
-}
-
-//	everything below is reusable boilerplate
 func solveSequential(j Jam) {
-	caseCount := j.Ri()
-	for index := int64(0); index < caseCount; index++ {
-		writeCaseOutput(j, solveCase(readCaseInput(j, index)))
+	T := j.Ri()
+	for t := int64(0); t < T; t++ {
+		N := j.Ri();
+		W := make([]string, 0, N)
+		rhymingSuffixLen := make([]int, N, N)
+		maxLen := 1
+		for i := int64(0); i < N; i++ {
+			w := j.Rs()
+			W = append(W, w)
+			maxLen = max(maxLen, len(w))
+			rhymingSuffixLen[i] = -1
+		}
+
+		for suffixLen := maxLen - 1; suffixLen > 0; suffixLen-- {
+			rhymesToW := make(map[string][]int)
+			for i, w := range W {
+				if rhymingSuffixLen[i] >= 0 || len(w) < suffixLen {
+					continue
+				}
+				suffix := w[len(w)-suffixLen:]
+				ws, prs := rhymesToW[suffix]
+				if !prs {
+					ws = make([]int, 0, N)
+				}
+				ws = append(ws, i)
+				rhymesToW[suffix] = ws
+			}
+
+			for _, ws := range rhymesToW {
+				if len(ws) > 1 {
+					w0, w1 := ws[0], ws[1]
+					rhymingSuffixLen[w0] = suffixLen
+					rhymingSuffixLen[w1] = suffixLen
+				}
+			}
+		}
+
+		rhymingCount := 0
+		for _, rsl := range rhymingSuffixLen {
+			if rsl > 0 {
+				rhymingCount += 1
+			}
+		}
+
+		j.W("Case #%d: %d\n", 1+t, rhymingCount)
 	}
 }
 
@@ -143,47 +147,9 @@ func (j *jam) W(format string, values ...interface{}) {
 	}
 }
 
-//	GoLang shorthand methods for math go below
-//	TODO wipe unused methods before submitting
-
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
-}
-
 func max(a, b int) int {
 	if a > b {
 		return a
 	}
 	return b
-}
-
-func abs(a int) int {
-	if a < 0 {
-		return -a
-	}
-	return a
-}
-
-func min64(a, b int64) int64 {
-	if a < b {
-		return a
-	}
-	return b
-}
-
-func max64(a, b int64) int64 {
-	if a > b {
-		return a
-	}
-	return b
-}
-
-func abs64(a int64) int64 {
-	if a < 0 {
-		return -a
-	}
-	return a
 }
