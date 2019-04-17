@@ -1,4 +1,7 @@
+*.patch
+
 .idea/
+*.iml
 
 bin/
 build/
