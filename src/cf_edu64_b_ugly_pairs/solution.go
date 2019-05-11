@@ -7,28 +7,73 @@ import (
 	"strconv"
 )
 
-func solveOne(j Jam, t int64) {
-	size := int16(j.Int())
-	sum := int32(0)
-	for i := int16(0); i < size; i++ {
-		sum += int32(j.Int())
-	}
-	j.P("Case #%d: %d\n", t, sum)
-}
-
-func solveAll(j Jam) {
-	_, _ = fmt.Fprintf(os.Stderr, "started")
-	T := j.Int()
-	_, _ = fmt.Fprintf(os.Stderr, "%d tests", T)
-	for t := int64(1); t <= T; t++ {
-		solveOne(j, t)
+func solve(j Jam) {
+	T := int16(j.Int())
+	for t := int16(0); t < T; t++ {
+		in := j.Str()
+		runeCount := make([]int, 26)
+		for _, r := range []rune(in) {
+			rIdx := int(r - 'a')
+			runeCount[rIdx] += 1
+		}
+		presentRunes := make([]int, 0, 26)
+		for r := range runeCount {
+			if runeCount[r] > 0 {
+				presentRunes = append(presentRunes, r)
+			}
+		}
+		result := make([]rune, 0)
+		seed := presentRunes[0]
+		for i := 0; i < runeCount[seed]; i++ {
+			result = append(result, rune('a'+seed))
+		}
+		presentRunes = presentRunes[1:]
+		left, right := seed, seed
+		retryRunes := make([]int, 0, 26)
+		for _, r := range presentRunes {
+			if right+1 != r {
+				for i := 0; i < runeCount[r]; i++ {
+					result = append(result, rune('a'+r))
+				}
+				right = r
+			} else if left+1 != r {
+				for i := 0; i < runeCount[r]; i++ {
+					result = append([]rune{rune('a' + r)}, result...)
+				}
+				left = r
+			} else {
+				retryRunes = append(retryRunes, r)
+			}
+		}
+		valid := true
+		for _, r := range retryRunes {
+			if abs(right-r) != 1 {
+				for i := 0; i < runeCount[r]; i++ {
+					result = append(result, rune('a'+r))
+				}
+				right = r
+			} else if abs(left-r) != 1 {
+				for i := 0; i < runeCount[r]; i++ {
+					result = append([]rune{rune('a' + r)}, result...)
+				}
+				left = r
+			} else {
+				valid = false
+				break
+			}
+		}
+		if !valid {
+			j.P("No answer\n")
+		} else {
+			j.P("%s\n", string(result))
+		}
 	}
 }
 
 func main() {
 	jam, closeFunc := JamNew()
 	defer closeFunc()
-	solveAll(jam)
+	solve(jam)
 }
 
 type Jam interface {
@@ -94,6 +139,9 @@ func (j *jam) Int() int64 {
 	if err != nil {
 		panic(err)
 	}
+
+	_, _ = fmt.Fprintf(os.Stderr, "scanned %d", res)
+	_ = os.Stderr.Sync()
 
 	return res
 }

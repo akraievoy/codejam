@@ -4,31 +4,40 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"sort"
 	"strconv"
 )
 
-func solveOne(j Jam, t int64) {
-	size := int16(j.Int())
-	sum := int32(0)
-	for i := int16(0); i < size; i++ {
-		sum += int32(j.Int())
-	}
-	j.P("Case #%d: %d\n", t, sum)
-}
+type SortableInts64 []int64
 
-func solveAll(j Jam) {
-	_, _ = fmt.Fprintf(os.Stderr, "started")
-	T := j.Int()
-	_, _ = fmt.Fprintf(os.Stderr, "%d tests", T)
-	for t := int64(1); t <= T; t++ {
-		solveOne(j, t)
+func (si SortableInts64) Len() int           { return len(si) }
+func (si SortableInts64) Less(i, j int) bool { return si[i] < si[j] }
+func (si SortableInts64) Swap(i, j int)      { si[i], si[j] = si[j], si[i] }
+
+func solve(j Jam) {
+	n, z := j.Int(), j.Int()
+	x := make([]int64, n, n)
+	for i := range x {
+		x[i] = j.Int()
 	}
+	sort.Sort(SortableInts64(x))
+	left, right, matchedPairs := int64(0), (n+1)/2, int64(0)
+	for left < right && left < (n+1)/2 && right < n {
+		if x[right]-x[left] >= z {
+			left += 1
+			right += 1
+			matchedPairs += 1
+		} else {
+			right += 1
+		}
+	}
+	j.P("%d\n", matchedPairs)
 }
 
 func main() {
 	jam, closeFunc := JamNew()
 	defer closeFunc()
-	solveAll(jam)
+	solve(jam)
 }
 
 type Jam interface {
@@ -122,49 +131,4 @@ func (j *jam) PF(format string, values ...interface{}) {
 	if err = j.wr.Flush(); err != nil {
 		panic(err)
 	}
-}
-
-//	GoLang shorthand methods for math go below
-//	TODO wipe unused methods before submitting
-
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
-}
-
-func max(a, b int) int {
-	if a > b {
-		return a
-	}
-	return b
-}
-
-func abs(a int) int {
-	if a < 0 {
-		return -a
-	}
-	return a
-}
-
-func min64(a, b int64) int64 {
-	if a < b {
-		return a
-	}
-	return b
-}
-
-func max64(a, b int64) int64 {
-	if a > b {
-		return a
-	}
-	return b
-}
-
-func abs64(a int64) int64 {
-	if a < 0 {
-		return -a
-	}
-	return a
 }

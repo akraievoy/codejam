@@ -7,28 +7,66 @@ import (
 	"strconv"
 )
 
-func solveOne(j Jam, t int64) {
-	size := int16(j.Int())
+func solve(j Jam) {
+	size := int32(j.Int())
+	infinite := false
 	sum := int32(0)
-	for i := int16(0); i < size; i++ {
-		sum += int32(j.Int())
-	}
-	j.P("Case #%d: %d\n", t, sum)
-}
+	prevPrevFigure := int64(0)
+	prevFigure := int64(0)
+	for i := int32(0); i < size; i++ {
+		figure := j.Int()
+		switch figure {
+		case 1: //	circle
+			switch prevFigure {
+			case 1:
+				infinite = true
+			case 2:
+				sum += 3
+			case 3:
+				sum += 4
+			}
+		case 2: //	triangle
+			switch prevFigure {
+			case 1:
+				if prevPrevFigure == 3 {
+					sum += 2
+				} else {
+					sum += 3
+				}
+			case 2:
+				infinite = true
+			case 3:
+				infinite = true
+			}
+		case 3: //	square
+			switch prevFigure {
+			case 1:
+				sum += 4
+			case 2:
+				infinite = true
+			case 3:
+				infinite = true
+			}
+		}
+		if infinite {
+			break
+		}
 
-func solveAll(j Jam) {
-	_, _ = fmt.Fprintf(os.Stderr, "started")
-	T := j.Int()
-	_, _ = fmt.Fprintf(os.Stderr, "%d tests", T)
-	for t := int64(1); t <= T; t++ {
-		solveOne(j, t)
+		prevPrevFigure = prevFigure
+		prevFigure = figure
+	}
+	if infinite {
+		j.P("Infinite\n")
+	} else {
+		j.P("Finite\n")
+		j.P("%d\n", sum)
 	}
 }
 
 func main() {
 	jam, closeFunc := JamNew()
 	defer closeFunc()
-	solveAll(jam)
+	solve(jam)
 }
 
 type Jam interface {
@@ -95,6 +133,9 @@ func (j *jam) Int() int64 {
 		panic(err)
 	}
 
+	_, _ = fmt.Fprintf(os.Stderr, "scanned %d", res)
+	_ = os.Stderr.Sync()
+
 	return res
 }
 
@@ -122,49 +163,4 @@ func (j *jam) PF(format string, values ...interface{}) {
 	if err = j.wr.Flush(); err != nil {
 		panic(err)
 	}
-}
-
-//	GoLang shorthand methods for math go below
-//	TODO wipe unused methods before submitting
-
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
-}
-
-func max(a, b int) int {
-	if a > b {
-		return a
-	}
-	return b
-}
-
-func abs(a int) int {
-	if a < 0 {
-		return -a
-	}
-	return a
-}
-
-func min64(a, b int64) int64 {
-	if a < b {
-		return a
-	}
-	return b
-}
-
-func max64(a, b int64) int64 {
-	if a > b {
-		return a
-	}
-	return b
-}
-
-func abs64(a int64) int64 {
-	if a < 0 {
-		return -a
-	}
-	return a
 }
