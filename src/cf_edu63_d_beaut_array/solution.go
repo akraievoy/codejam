@@ -7,22 +7,62 @@ import (
 	"strconv"
 )
 
-func solveOne(j Jam, t int64) {
-	size := int16(j.Int())
-	sum := int32(0)
-	for i := int16(0); i < size; i++ {
-		sum += int32(j.Int())
+func solveAll(jam Jam) {
+	s, l, ui, f, d, p, pf := jam.Str, jam.Long, jam.Int, jam.Float, jam.D, jam.P, jam.PF
+
+	n, x := l(), l()
+	a := make([]int64, n, n)
+	var b [300001][3][3]int64
+
+	for i := int64(0); i < n; i++ {
+		a[i] = l()
 	}
-	j.P("Case #%d: %d\n", t, sum)
+	b[0][0][0] = 0
+
+	for i := int64(0); i <= n; i++ {
+		for j := int64(0); j < 3; j++ {
+			for k := int64(0); k < 3; k++ {
+				if k < 2 {
+					b[i][j][k+1] =
+						max(
+							b[i][j][k+1],
+							b[i][j][k],
+						)
+				}
+				if j < 2 {
+					b[i][j+1][k] =
+						max(
+							b[i][j+1][k],
+							b[i][j][k],
+						)
+				}
+				if i < n {
+					b[i+1][j][k] =
+						max(
+							b[i+1][j][k],
+							b[i][j][k]+t(j == 1, a[i], 0)*t(k == 1, x, 1),
+						)
+				}
+			}
+		}
+	}
+
+	pf("%d\n", b[n][2][2])
+
+	if false { d("%v", []interface{}{s, l, ui, f, d, p, pf}) }
 }
 
-func solveAll(j Jam) {
-	_, _ = fmt.Fprintf(os.Stderr, "started")
-	T := j.Int()
-	_, _ = fmt.Fprintf(os.Stderr, "%d tests", T)
-	for t := int64(1); t <= T; t++ {
-		solveOne(j, t)
+func t(b bool, t, f int64) int64 {
+	if b {
+		return t
 	}
+	return f
+}
+func max(a, b int64) int64 {
+	if a > b {
+		return a
+	}
+	return b
 }
 
 func main() {
@@ -37,9 +77,11 @@ type Jam interface {
 	Close()
 
 	Str() string
-	Int() int64
+	Long() int64
+	Int() uint32
 	Float() float64
 
+	D(format string, values ...interface{})
 	P(format string, values ...interface{})
 	PF(format string, values ...interface{})
 }
@@ -53,7 +95,7 @@ func JamNew() (Jam, func()) {
 	scanner.Split(bufio.ScanWords)
 	scanner.Buffer(make([]byte, 0, 1024*1024), 1024*1024)
 
-	var writer = bufio.NewWriter(os.Stdout)
+	var writer = bufio.NewWriterSize(os.Stdout, 1024*1024)
 	jam := &jam{scanner, writer}
 	return jam, jam.Close
 }
@@ -85,7 +127,7 @@ func (j *jam) Str() string {
 	return j.sc.Text()
 }
 
-func (j *jam) Int() int64 {
+func (j *jam) Long() int64 {
 	if !j.sc.Scan() {
 		panic("failed to scan next token")
 	}
@@ -98,6 +140,10 @@ func (j *jam) Int() int64 {
 	return res
 }
 
+func (j *jam) Int() uint32 {
+	return uint32(j.Long())
+}
+
 func (j *jam) Float() float64 {
 	j.sc.Scan()
 	res, err := strconv.ParseFloat(j.sc.Text(), 64)
@@ -105,6 +151,13 @@ func (j *jam) Float() float64 {
 		panic(err)
 	}
 	return res
+}
+
+func (j *jam) D(format string, values ...interface{}) {
+	_ /*bytesWritten*/, err := fmt.Fprintf(os.Stderr, format, values...)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func (j *jam) P(format string, values ...interface{}) {
@@ -122,49 +175,4 @@ func (j *jam) PF(format string, values ...interface{}) {
 	if err = j.wr.Flush(); err != nil {
 		panic(err)
 	}
-}
-
-//	GoLang shorthand methods for math go below
-//	TODO wipe unused methods before submitting
-
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
-}
-
-func max(a, b int) int {
-	if a > b {
-		return a
-	}
-	return b
-}
-
-func abs(a int) int {
-	if a < 0 {
-		return -a
-	}
-	return a
-}
-
-func min64(a, b int64) int64 {
-	if a < b {
-		return a
-	}
-	return b
-}
-
-func max64(a, b int64) int64 {
-	if a > b {
-		return a
-	}
-	return b
-}
-
-func abs64(a int64) int64 {
-	if a < 0 {
-		return -a
-	}
-	return a
 }

@@ -20,11 +20,11 @@ func TestSimple(t *testing.T) {
 	b := rnd.Int31n(100)
 	c := rnd.Int31n(100)
 
-	input := fmt.Sprintf("3\n%d %d %d", a, b, c)
-	outputExpected := fmt.Sprintf("Case #3: %d\n", a+b+c)
+	input := fmt.Sprintf("1\n3\n%d %d %d", a, b, c)
+	outputExpected := fmt.Sprintf("Case #1: %d\n", a+b+c)
 
 	j, closeResFunc := JamNewMock(input)
-	solveOne(j, 3)
+	solveAll(j)
 	res := closeResFunc()
 
 	if res != outputExpected {
@@ -38,7 +38,7 @@ func JamNewMock(input string) (Jam, func() string) {
 	scanner.Buffer(make([]byte, 0, 1024*1024), 1024*1024)
 
 	b := new(bytes.Buffer)
-	var writer = bufio.NewWriter(b)
+	var writer = bufio.NewWriterSize(b, 1024*1024)
 	jam := &jam{scanner, writer}
 	return jam, func() string {
 		jam.Close()
