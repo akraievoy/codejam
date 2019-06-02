@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"math"
 	"os"
 	"strconv"
 )
@@ -12,67 +11,62 @@ func solveAll(jam Jam) {
 	s, l, ui, f, d, p, pf := jam.Str, jam.Long, jam.Int, jam.Float, jam.D, jam.P, jam.PF
 	//	Live Templates: for0l for1l for0ui for1ui forr vl0 vln vui0 vuin ; Casts: l i
 
-	T := l()
-	d("%d tests", T)
-	for t := int64(1); t <= T; t++ {
-		size := l()
-		arr := make([]int64, 0, size)
-		for i, e := range arr {
-			d("%d %d\n", i, e)
+	noTriples := make(map[string]bool)
+	noTriples["00"], noTriples["01"], noTriples["10"], noTriples["11"] = true, true, true, true
+
+	added := true
+	ln := 2
+	for added {
+		added = false
+
+		for k := range noTriples {
+			if len(k) != ln {
+				continue
+			}
+			for _, suff := range [2]rune{'0', '1'} {
+				test := k + string([]rune{suff})
+				noTriplesInTest := true
+				for k := 1; 2*k < len(test) && noTriplesInTest; k++ {
+					for x := 0; x < len(test) - 2*k && noTriplesInTest; x++ {
+						if test[x] == test[x+k] && test[x+k] == test[x+2*k] {
+							noTriplesInTest = false
+						}
+					}
+				}
+				if noTriplesInTest {
+					//d("%s ", test)
+					noTriples[test] = true
+					added = true
+				}
+			}
 		}
-		sum := int64(0)
-		for i := int64(0); i < size; i++ {
-			sum += l()
-		}
-		p("Case #%d: %d\n", t, sum)
+		ln += 1
+		//d("\n")
 	}
+
+	noTriples[""], noTriples["0"], noTriples["1"] = true, true, true
+
+	str := s()
+	pairs := uint64(len(str))*uint64(len(str)-1)/2
+	//d("INIT: %d\n", pairs)
+	buf := ""
+	for _, r := range []rune(str) {
+		buf = buf + string([]rune{r})
+		//d("%s %s", string([]rune{r}), buf)
+		for !noTriples[buf] {
+			buf = buf[1:]
+			//d(" :%s", buf)
+		}
+		if noTriples[buf] {
+			//d(" -%d", len(buf)-1)
+			pairs -= uint64(len(buf)-1)
+		}
+		//d("\n")
+	}
+
+	p("%d", pairs)
 
 	if false { d("%v", []interface{}{s, l, ui, f, d, p, pf}) }
-}
-
-//	TODO wipe unused shorthand methods for math
-type Uint32Sort []uint32
-func (s Uint32Sort) Len() int           { return len(s) }
-func (s Uint32Sort) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
-func (s Uint32Sort) Less(i, j int) bool { return s[i] < s[j] }
-
-func t(b bool, t, f int64) int64 { if b {return t};return f }
-func min(a, b int64) int64 { if a < b {return a}; return b }
-func max(a, b int64) int64 { if a > b {return a}; return b }
-func abs(a int64) int64 { if a < 0 { return -a }; return a }
-func ti(b bool, t, f uint32) uint32 { if b {return t};return f }
-func mini(a, b uint32) uint32 { if a < b { return a }; return b }
-func maxi(a, b uint32) uint32 { if a > b { return a }; return b }
-func ts(b bool, t, f string) string { if b {return t};return f }
-
-func round(x float64) float64 { //	https://www.cockroachlabs.com/blog/rounding-implementations-in-go/
-	const (
-		mask     = 0x7FF
-		shift    = 64 - 11 - 1
-		bias     = 1023
-
-		signMask = 1 << 63
-		fracMask = (1 << shift) - 1
-		halfMask = 1 << (shift - 1)
-		one      = bias << shift
-	)
-
-	bits := math.Float64bits(x)
-	e := uint(bits>>shift) & mask
-	switch {
-	case e < bias:
-		// Round abs(x)<1 including denormals.
-		bits &= signMask // +-0
-		if e == bias-1 {
-			bits |= one // +-1
-		}
-	case e < bias+shift:
-		// Round any abs(x)>=1 containing a fractional component [0,1).
-		e -= bias
-		bits += halfMask >> e
-		bits &^= fracMask >> e
-	}
-	return math.Float64frombits(bits)
 }
 
 func main() {

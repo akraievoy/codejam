@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math"
 	"os"
+	"sort"
 	"strconv"
 )
 
@@ -12,20 +13,38 @@ func solveAll(jam Jam) {
 	s, l, ui, f, d, p, pf := jam.Str, jam.Long, jam.Int, jam.Float, jam.D, jam.P, jam.PF
 	//	Live Templates: for0l for1l for0ui for1ui forr vl0 vln vui0 vuin ; Casts: l i
 
-	T := l()
-	d("%d tests", T)
-	for t := int64(1); t <= T; t++ {
-		size := l()
-		arr := make([]int64, 0, size)
-		for i, e := range arr {
-			d("%d %d\n", i, e)
-		}
-		sum := int64(0)
-		for i := int64(0); i < size; i++ {
-			sum += l()
-		}
-		p("Case #%d: %d\n", t, sum)
+	n,m := ui(), ui()
+	a := make([]uint32, n, n)
+	for i := uint32(0); i < n; i++ {
+		a[i] = ui()
 	}
+
+	p(
+		"%d\n",
+		sort.Search(
+			int(m),
+			func(probeInt int) bool {
+				probe := uint32(probeInt)
+				//d("PROBE=%d\n", probe)
+				minBound := ti((a[0] + probe) >= m, 0, a[0])
+				//d("%d:%d ", a[0], minBound)
+				for i := uint32(1); i < n; i++ {
+					if minBound > a[i] + probe  {
+						//d("%d:FALSE\n", a[i])
+						return false
+					}
+					if (a[i] + probe) >= m && (a[i] + probe) % m >= minBound {
+						// do nothing
+					} else {
+						minBound = maxi(a[i], minBound)
+					}
+					//d("%d:%d ", a[i], minBound)
+				}
+				//d(" TRUE\n")
+					return true
+			},
+		),
+	)
 
 	if false { d("%v", []interface{}{s, l, ui, f, d, p, pf}) }
 }
@@ -43,7 +62,6 @@ func abs(a int64) int64 { if a < 0 { return -a }; return a }
 func ti(b bool, t, f uint32) uint32 { if b {return t};return f }
 func mini(a, b uint32) uint32 { if a < b { return a }; return b }
 func maxi(a, b uint32) uint32 { if a > b { return a }; return b }
-func ts(b bool, t, f string) string { if b {return t};return f }
 
 func round(x float64) float64 { //	https://www.cockroachlabs.com/blog/rounding-implementations-in-go/
 	const (

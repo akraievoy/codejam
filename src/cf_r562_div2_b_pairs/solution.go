@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"math"
 	"os"
 	"strconv"
 )
@@ -12,67 +11,37 @@ func solveAll(jam Jam) {
 	s, l, ui, f, d, p, pf := jam.Str, jam.Long, jam.Int, jam.Float, jam.D, jam.P, jam.PF
 	//	Live Templates: for0l for1l for0ui for1ui forr vl0 vln vui0 vuin ; Casts: l i
 
-	T := l()
-	d("%d tests", T)
-	for t := int64(1); t <= T; t++ {
-		size := l()
-		arr := make([]int64, 0, size)
-		for i, e := range arr {
-			d("%d %d\n", i, e)
-		}
-		sum := int64(0)
-		for i := int64(0); i < size; i++ {
-			sum += l()
-		}
-		p("Case #%d: %d\n", t, sum)
+	n, m := uint32(l()), uint32(l())
+	a, b := make([]uint32, m, m), make([]uint32, m, m)
+	for i := range a {
+		a[i], b[i] = ui(), ui()
 	}
 
-	if false { d("%v", []interface{}{s, l, ui, f, d, p, pf}) }
-}
+	for _, x := range [2]uint32{a[0], b[0]} {
+		ysize := uint32(0)
+		ydeg := make([]uint32, n+1, n+1)
+		for i := range a {
+			if a[i] == x || b[i] == x {
+				continue
+			}
 
-//	TODO wipe unused shorthand methods for math
-type Uint32Sort []uint32
-func (s Uint32Sort) Len() int           { return len(s) }
-func (s Uint32Sort) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
-func (s Uint32Sort) Less(i, j int) bool { return s[i] < s[j] }
-
-func t(b bool, t, f int64) int64 { if b {return t};return f }
-func min(a, b int64) int64 { if a < b {return a}; return b }
-func max(a, b int64) int64 { if a > b {return a}; return b }
-func abs(a int64) int64 { if a < 0 { return -a }; return a }
-func ti(b bool, t, f uint32) uint32 { if b {return t};return f }
-func mini(a, b uint32) uint32 { if a < b { return a }; return b }
-func maxi(a, b uint32) uint32 { if a > b { return a }; return b }
-func ts(b bool, t, f string) string { if b {return t};return f }
-
-func round(x float64) float64 { //	https://www.cockroachlabs.com/blog/rounding-implementations-in-go/
-	const (
-		mask     = 0x7FF
-		shift    = 64 - 11 - 1
-		bias     = 1023
-
-		signMask = 1 << 63
-		fracMask = (1 << shift) - 1
-		halfMask = 1 << (shift - 1)
-		one      = bias << shift
-	)
-
-	bits := math.Float64bits(x)
-	e := uint(bits>>shift) & mask
-	switch {
-	case e < bias:
-		// Round abs(x)<1 including denormals.
-		bits &= signMask // +-0
-		if e == bias-1 {
-			bits |= one // +-1
+			ydeg[a[i]]++
+			ydeg[b[i]]++
+			ysize++
 		}
-	case e < bias+shift:
-		// Round any abs(x)>=1 containing a fractional component [0,1).
-		e -= bias
-		bits += halfMask >> e
-		bits &^= fracMask >> e
+		for _, e := range ydeg {
+			if e == ysize {
+				p("YES\n")
+				return
+			}
+		}
 	}
-	return math.Float64frombits(bits)
+
+	p("NO\n")
+
+	if false {
+		d("%v", []interface{}{s, l, ui, f, d, p, pf})
+	}
 }
 
 func main() {
@@ -186,4 +155,3 @@ func (j *jam) PF(format string, values ...interface{}) {
 		panic(err)
 	}
 }
-
