@@ -8,6 +8,8 @@ import (
 	"strconv"
 )
 
+var DEBUG = false
+
 func solveAll(jam Jam) {
 	s, l, ui, f, d, p, pf := jam.Str, jam.Long, jam.Int, jam.Float, jam.D, jam.P, jam.PF
 	//	Live Templates: for0l for1l for0ui for1ui forr vl0 vln vui0 vuin ; Casts: l i
@@ -164,6 +166,10 @@ func (j *jam) Float() float64 {
 }
 
 func (j *jam) D(format string, values ...interface{}) {
+	//noinspection GoBoolExpressions
+	if !DEBUG {
+		return
+	}
 	_ /*bytesWritten*/, err := fmt.Fprintf(os.Stderr, format, values...)
 	if err != nil {
 		panic(err)

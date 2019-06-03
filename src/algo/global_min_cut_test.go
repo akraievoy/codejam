@@ -88,7 +88,7 @@ func randomProbe(size uint32, timeoutSeconds float64, t *testing.T) {
 			if actual != expected {
 				for _,r := range cm {
 					for _,linkCap := range r {
-						fmt.Printf("%8d", linkCap)
+						fmt.Printf("%8f", linkCap)
 					}
 					fmt.Printf("\n")
 				}
