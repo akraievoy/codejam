@@ -15,8 +15,8 @@ func solveAll(jam Jam) {
 	//	Live Templates: for0l for1l for0ui for1ui forr vl0 vln vui0 vuin ; Casts: l i
 
 	T := l()
-	d("%d tests", T)
 	for t := int64(1); t <= T; t++ {
+		d("test %d of %d\n", t, T)
 		size := l()
 		arr := make([]int64, 0, size)
 		for i, e := range arr {
@@ -33,19 +33,76 @@ func solveAll(jam Jam) {
 }
 
 //	TODO wipe unused shorthand methods for math
+func sliceL2D(R, C int64) [][]int64 {
+	res := make([][]int64, 0, R)
+	for r := int64(0); r < R; r++ {
+		res = append(res, make([]int64, C, C))
+	}
+	return res
+}
+
+func sliceL3D(L, R, C int64) [][][]int64 {
+	res := make([][][]int64, L, L)
+	for l := int64(0); l < L; l++ {
+		res[l] = make([][]int64, 0, R)
+		for r := int64(0); r < R; r++ {
+			res[l] = append(res[l], make([]int64, C, C))
+		}
+	}
+	return res
+}
+
+func sliceUI2D(R, C int64) [][]uint32 {
+	res := make([][]uint32, 0, R)
+	for r := int64(0); r < R; r++ {
+		res = append(res, make([]uint32, C, C))
+	}
+	return res
+}
+
+func sliceUI3D(L, R, C int64) [][][]uint32 {
+	res := make([][][]uint32, L, L)
+	for l := int64(0); l < L; l++ {
+		res[l] = make([][]uint32, 0, R)
+		for r := int64(0); r < R; r++ {
+			res[l] = append(res[l], make([]uint32, C, C))
+		}
+	}
+	return res
+}
+
+func sliceF2D(R, C int64) [][]float64 {
+	res := make([][]float64, 0, R)
+	for r := int64(0); r < R; r++ {
+		res = append(res, make([]float64, C, C))
+	}
+	return res
+}
+
+func sliceF3D(L, R, C int64) [][][]float64 {
+	res := make([][][]float64, L, L)
+	for l := int64(0); l < L; l++ {
+		res[l] = make([][]float64, 0, R)
+		for r := int64(0); r < R; r++ {
+			res[l] = append(res[l], make([]float64, C, C))
+		}
+	}
+	return res
+}
+
 type Uint32Sort []uint32
 func (s Uint32Sort) Len() int           { return len(s) }
 func (s Uint32Sort) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
 func (s Uint32Sort) Less(i, j int) bool { return s[i] < s[j] }
 
-func t(b bool, t, f int64) int64 { if b {return t};return f }
+func tern(b bool, t, f int64) int64 { if b {return t};return f }
 func min(a, b int64) int64 { if a < b {return a}; return b }
 func max(a, b int64) int64 { if a > b {return a}; return b }
 func abs(a int64) int64 { if a < 0 { return -a }; return a }
-func ti(b bool, t, f uint32) uint32 { if b {return t};return f }
-func mini(a, b uint32) uint32 { if a < b { return a }; return b }
-func maxi(a, b uint32) uint32 { if a > b { return a }; return b }
-func ts(b bool, t, f string) string { if b {return t};return f }
+func ternUI(b bool, t, f uint32) uint32 { if b {return t};return f }
+func minUI(a, b uint32) uint32 { if a < b { return a }; return b }
+func maxUI(a, b uint32) uint32 { if a > b { return a }; return b }
+func ternS(b bool, t, f string) string { if b {return t};return f }
 
 func round(x float64) float64 { //	https://www.cockroachlabs.com/blog/rounding-implementations-in-go/
 	const (

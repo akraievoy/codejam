@@ -1,0 +1,63 @@
+#!/bin/bash
+
+set -o nounset
+set -o errexit
+
+function pretty_echo {
+    local CAPTION=$1
+    local MESSAGE=$2
+    local COLOR=${3-blue}
+    if [ "$COLOR" == "green" ]; then
+        echo -e "\033[1;37m${CAPTION}\033[0m :: \033[1;32m${MESSAGE}\033[0m"
+    else
+        echo -e "\033[1;37m${CAPTION}\033[0m :: \033[1;36m${MESSAGE}\033[0m"
+    fi
+}
+
+if [ "${1-}" = "" ]; then
+    echo "Usage:
+    run TASK_RELPATH
+
+Valid values for TASK_RELPATH are: "
+    find src -type d | tail -n +2 | sed -E 's/^/ * /'
+    exit 1;
+fi
+
+clear
+pretty_echo "INIT" "DELETING TEST OUTPUTS" "green"
+find . -iname '*.actual.out' -print -delete
+echo
+
+CJ_TIME="$(date +%y%m%d_%H%M%S)"
+TASK_RELPATH=$1
+TASK_BINARY="$( echo "${TASK_RELPATH}" | sed -e 's:^src/::g' | sed -Ee 's:/$::g' )"
+if test -z "${GOROOT-}"; then
+  GOROOT=${HOME}/bin/go
+fi
+GOPATH="$( pwd )"
+
+export GOPATH
+export GOROOT
+
+pretty_echo "${TASK_RELPATH}" "go test with GOROOT=${GOROOT} GOPATH=${GOPATH}"
+bash -c "GOROOT=${GOROOT} && GOPATH=${GOPATH} && cd ${TASK_RELPATH} && time ${GOROOT}/bin/go test"
+
+pretty_echo "${TASK_RELPATH}" "go build with GOROOT=${GOROOT} GOPATH=${GOPATH}"
+bash -c "GOROOT=${GOROOT} && GOPATH=${GOPATH} && time ${GOROOT}/bin/go build -o bin/${TASK_BINARY} ${TASK_RELPATH}/solution.go"
+
+for TEST_IN in $(find "${TASK_RELPATH}" -iname '*.in' | sort -n); do
+    pretty_echo "${TASK_RELPATH}" "Comparing output for ${TEST_IN}"
+
+    # shellcheck disable=SC2001
+    TEST_BASE="$(echo "$TEST_IN" | sed -e 's/\.in$//g')" ;
+
+    time "bin/${TASK_BINARY}" \
+        <"$TEST_IN" \
+        >"${TEST_BASE}.${CJ_TIME}.actual.out"
+
+    diff -y  --ignore-all-space \
+        "${TEST_BASE}.out" \
+        "${TEST_BASE}.${CJ_TIME}.actual.out"
+done
+
+pretty_echo "${TASK_RELPATH}" "READY FOR UPLOAD" "green"
