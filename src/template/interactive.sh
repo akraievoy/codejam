@@ -1,3 +1,5 @@
 #!/bin/bash
-echo running test set ${1-0}
-go build . && rm f0 && mkfifo f0 ; python testing_tool.py ${1-0} < f0 | ./cj19_1a_c > f0
+TASK_NAME=d
+for test_number in 0 1 2 ; do
+  python3 src/${TASK_NAME}/interactive_runner.py python3 src/${TASK_NAME}/local_testing_tool.py ${test_number} -- bin/${TASK_NAME}
+done

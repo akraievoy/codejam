@@ -58,8 +58,8 @@ func CompetitiveCompanionCompanionServer(w http.ResponseWriter, r *http.Request)
 			"-v", fmt.Sprintf("src/%c/solution_test.go", letter),
 		) ||
 		!req.Interactive && exec(
-			"rm",
-			"-v", fmt.Sprintf("src/%c/interactive.sh", letter),
+			"bash",
+			"-c", fmt.Sprintf("rm -v src/%c/interactive*", letter),
 		) ||
 		exec(
 			"bash", "-c", fmt.Sprintf("rm -v src/%c/*.in src/%c/*.out", letter, letter),
