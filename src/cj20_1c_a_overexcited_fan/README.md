@@ -1,0 +1,1 @@
+[Google Coding Competitions - Round 1C 2020 - Code Jam 2020 -- **Overexcited Fan**](https://codingcompetitions.withgoogle.com/codejam/round/000000000019fef4/0000000000317409)
