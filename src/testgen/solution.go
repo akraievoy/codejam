@@ -3,51 +3,90 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"os"
-	"strconv"
 	"math/rand"
+	"os"
+	"time"
 )
 
 func main() {
-	var writer = bufio.NewWriter(os.Stdout)
-	defer writer.Flush()
+	basePath := "src/a/"
 
-	r := rand.New(rand.NewSource(99))
-	size := 100000
+	seed := time.Now().Unix()
+	r := rand.New(rand.NewSource(seed))
+	caseCount := 10
+	testIndex, testInput, testOutput, logWriter, closeFunc := probeAndOpen(basePath)
+	defer closeFunc()
 
-	Writef(writer, "%d\n", size)
+	writef(logWriter, "test# = %02d caseCount = %d seed = %d\n", testIndex, caseCount, seed)
 
-	Writef(writer, "%d\n", r.Int31n(1000000001))
+	writef(testInput, "%d\n", caseCount)
+	for caseI := 1; caseI <= caseCount; caseI++ {
 
-	for i := 1; i < size; i++ {
-		Writef(writer, "%d", r.Int31n(1000000001))
-		if i + 1 < size {
-			Writef(writer, " ")
+		writef(logWriter, "Case #%d -- input generation...\n", caseI)
+		l := r.Intn(1000000 * 1000)
+		r := r.Intn(1000000 * 1000)
+
+		writef(testInput, "%d %d\n", l, r)
+
+		writef(logWriter, "Case #%d -- solution...\n", caseI)
+		i := 1
+		for ; i <= l || i <= r; i++ {
+			if l >= r {
+				l -= i
+			} else {
+				r -= i
+			}
 		}
-	}
-	Writef(writer, "\n")
 
-	for i := 1; i < size; i++ {
-		Writef(writer, "%d", r.Int31n(2000000001) - 1000000000)
-		if i + 1 < size {
-			Writef(writer, " ")
-		}
+		writef(logWriter, "Case #%d -- output generation...\n", caseI)
+		writef(testOutput, "Case #%d: %d %d %d\n", caseI, i-1, l, r)
 	}
-	Writef(writer, "\n")
 }
 
-func ReadInt64(sc *bufio.Scanner) int64 {
-	sc.Scan()
-	res, err := strconv.ParseInt(sc.Text(), 10, 64)
+func probeAndOpen(basePath string) (int, *bufio.Writer, *bufio.Writer, *bufio.Writer, func()) {
+	testIndex := 0
+	for {
+		if _, err := os.Stat(fmt.Sprintf("%s/%02d.in", basePath, testIndex)); err != nil {
+			break
+		}
+		testIndex += 1
+	}
+
+	testInput, err := os.Create(fmt.Sprintf("%s/%02d.in", basePath, testIndex))
 	if err != nil {
 		panic(err)
 	}
-	return res
+	testOutput, err := os.Create(fmt.Sprintf("%s/%02d.out", basePath, testIndex))
+	if err != nil {
+		panic(err)
+	}
+	testInputWriter := bufio.NewWriter(testInput)
+	testOutputWriter := bufio.NewWriter(testOutput)
+	logWriter := bufio.NewWriterSize(os.Stderr, 1)
+
+	// close on exit and check for returned errors
+	closeFunc := func() {
+		if err := testInputWriter.Flush(); err != nil {
+			panic(err)
+		}
+		if err := testInput.Close(); err != nil {
+			panic(err)
+		}
+		if err := testOutputWriter.Flush(); err != nil {
+			panic(err)
+		}
+		if err := testOutput.Close(); err != nil {
+			panic(err)
+		}
+		if err := logWriter.Flush(); err != nil {
+			panic(err)
+		}
+	}
+	return testIndex, testInputWriter, testOutputWriter, logWriter, closeFunc
 }
 
-func Writef(writer *bufio.Writer, formatStr string, values ...interface{}) {
-	out := fmt.Sprintf(formatStr, values...)
-	_, err := writer.WriteString(out)
+func writef(writer *bufio.Writer, formatStr string, values ...interface{}) {
+	_, err := fmt.Fprintf(writer, formatStr, values...)
 	if err != nil {
 		panic(err)
 	}

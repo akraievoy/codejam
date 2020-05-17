@@ -105,7 +105,7 @@ func exec(cmdName string, cmdArgs ...string) bool {
 	cpOut, err := cpCmd.CombinedOutput()
 
 	if len(cpOut) > 0 {
-		fmt.Printf("+DBG %s %s\n", cmdName, strings.Join(cmdArgs, ""))
+		fmt.Printf("+DBG %s %s\n", cmdName, strings.Join(cmdArgs, " "))
 		fmt.Printf("%s", cpOut)
 		fmt.Printf("-DBG\n")
 	}
