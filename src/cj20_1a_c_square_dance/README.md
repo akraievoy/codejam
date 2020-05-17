@@ -1,1 +1,0 @@
-[Round 1A 2020 - Code Jam 2020 -- **Square Dance**](https://codingcompetitions.withgoogle.com/codejam/round/000000000019fd74/00000000002b1355)
