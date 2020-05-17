@@ -1,0 +1,1 @@
+[Google Coding Competitions - Round 2 2020 - Code Jam 2020 -- **Incremental House of Pancakes**](https://codingcompetitions.withgoogle.com/codejam/round/000000000019ffb9/00000000003384ea)
