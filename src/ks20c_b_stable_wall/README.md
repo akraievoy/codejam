@@ -1,0 +1,1 @@
+[Google Coding Competitions - Round C 2020 - Kick Start 2020 -- **Stable Wall**](https://codingcompetitions.withgoogle.com/kickstart/round/000000000019ff43/00000000003379bb)

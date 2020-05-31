@@ -1,0 +1,1 @@
+[Google Coding Competitions - Round C 2020 - Kick Start 2020 -- **Candies**](https://codingcompetitions.withgoogle.com/kickstart/round/000000000019ff43/0000000000337b4d)
