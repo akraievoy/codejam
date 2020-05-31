@@ -12,7 +12,7 @@ var DEBUG = false
 
 func solveAll(jm Jam) {
 	//	Live Templates: for0i8 for1i8 forr v0i8 vi8 ; Casts: i8
-	s, i8, u4, f8,
+	scanS, i8, u4, f8,
 	df, pf, ff,
 	d, p, f :=
 		jm.ScanS, jm.ScanI8, jm.ScanU4, jm.ScanF8,
@@ -20,36 +20,37 @@ func solveAll(jm Jam) {
 		jm.Debug, jm.Print, jm.Flush
 
 	T := i8()
-	for t := int64(1); t <= T; t++ {
-		df("test %d of %d\n", t, T)
+	for ti := int64(1); ti <= T; ti++ {
+		df("test %d of %d\n", ti, T)
 		n := i8()
-		if n > 1000 {
-			panic("houston")
+		s := make([]int64, 0)
+		for i := int64(0); i*i <= n*100; i++ {
+			s = append(s, i*i)
 		}
-		arr := make([]int64, n, n)
-		sum := make([]int64, n+1, n+1)
-		for i := range arr {
-			arr[i] = i8()
-			sum[i+1] = sum[i] + arr[i]
-		}
-		squares := make(map[int64]bool)
-		for i := 0; i*i < 100*1000; i++ {
-			squares[int64(i*i)] = true
-		}
-		perfectSubArrays := 0
-		for start := int64(0); start < n; start++ {
-			for end := start+1; end <= n; end++ {
-				subsum := sum[end]-sum[start]
-				if squares[subsum] {
-					perfectSubArrays += 1
+		t := make(map[int64]int64)
+		t[0] = 1
+		perfectSubArrays := int64(0)
+		prefixSum := int64(0)
+		minPrefixSum := int64(0)
+		for i := int64(0); i < n; i++ {
+			arrI := i8()
+			prefixSum += arrI
+			for _, si := range s {
+				if prefixSum - si < minPrefixSum {
+					break
 				}
+				perfectSubArrays += t[prefixSum-si]
+			}
+			t[prefixSum] += 1
+			if prefixSum < minPrefixSum {
+				minPrefixSum = prefixSum
 			}
 		}
-		pf("Case #%d: %d\n", t, perfectSubArrays)
+		pf("Case #%d: %d\n", ti, perfectSubArrays)
 	}
 
 	if false {
-		df("%v", []interface{}{s, i8, u4, f8, df, pf, ff, d, p, f})
+		df("%v", []interface{}{scanS, i8, u4, f8, df, pf, ff, d, p, f})
 	}
 }
 
